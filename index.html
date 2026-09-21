@@ -4,18 +4,17 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Phi Tran — Backend &amp; DeFi Infrastructure Engineer</title>
-<meta name="description" content="Software engineer with 6+ years building backend systems on the money path: perpetual DEX, lending, options, RWA, on-chain data pipelines and AI agents." />
+<meta name="description" content="Backend engineer, 6+ years, building systems on the money path: perpetual DEX, lending, options, RWA, reorg-safe indexers, automated signing and AI agents with deterministic guardrails." />
 <meta name="author" content="Phi Tran" />
 
-<!-- Social preview (shows up when the link is shared on LinkedIn / X / Slack) -->
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://philliptran1402.github.io/" />
 <meta property="og:title" content="Phi Tran — Backend &amp; DeFi Infrastructure Engineer" />
-<meta property="og:description" content="Perp DEX · Lending · Options · RWA · On-chain data · AI agents. 6+ years building systems where a bug costs money." />
+<meta property="og:description" content="Six years building systems where a bug costs money. Perp DEX, lending, options, RWA, reorg-safe indexing, automated signing." />
 <meta property="og:image" content="https://github.com/philliptran1402.png" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Phi Tran — Backend &amp; DeFi Infrastructure Engineer" />
-<meta name="twitter:description" content="Perp DEX · Lending · Options · RWA · On-chain data · AI agents." />
+<meta name="twitter:description" content="Six years building systems where a bug costs money." />
 <meta name="twitter:image" content="https://github.com/philliptran1402.png" />
 
 <link rel="icon" href="https://github.com/philliptran1402.png" />
@@ -27,301 +26,246 @@
 <style>
   :root{
     --bg:#0b0c10;
-    --bg-soft:#111216;
-    --line:#22242b;
-    --line-soft:#1a1c22;
-    --fg:#ececf1;
-    --muted:#9ba1ad;
-    --dim:#6b7280;
+    --panel:#101116;
+    --line:#212329;
+    --line-soft:#191b20;
+    --fg:#eceef3;
+    --muted:#a2a8b4;
+    --dim:#6d7480;
     --accent:#4f9cf9;
-    --accent-soft:rgba(79,156,249,.12);
-    --green:#2dd4a7;
-    --radius:14px;
-    --max:960px;
-    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
-
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
   body{
-    margin:0;
-    background:var(--bg);
-    color:var(--fg);
-    font-family:var(--font);
-    font-size:15px;
-    line-height:1.65;
+    margin:0;background:var(--bg);color:var(--fg);
+    font-family:var(--font);font-size:15.5px;line-height:1.7;
     -webkit-font-smoothing:antialiased;
   }
-  a{color:inherit}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
 
-  /* soft glow behind the hero */
-  body::before{
-    content:"";
-    position:fixed;
-    top:-280px;left:50%;
-    width:900px;height:560px;
-    margin-left:-450px;
-    background:radial-gradient(ellipse at center,rgba(79,156,249,.13),transparent 68%);
-    pointer-events:none;
-    z-index:0;
+  /* header */
+  header{padding:72px 0 40px}
+  .id{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+  .id img{width:72px;height:72px;border-radius:50%;border:1px solid var(--line);flex:none}
+  h1{font-size:1.72rem;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+  .role{color:var(--muted);font-size:.95rem;margin:0}
+  .where{font-family:var(--mono);font-size:.74rem;color:var(--dim);margin:3px 0 0}
+  .pitch{font-size:1.06rem;color:var(--fg);margin:0 0 10px;line-height:1.65}
+  .pitch strong{font-weight:600}
+  .sub{color:var(--muted);margin:0 0 22px}
+  .links{display:flex;flex-wrap:wrap;gap:8px}
+  .links a{
+    font-size:.84rem;font-weight:500;color:var(--fg);
+    border:1px solid var(--line);background:var(--panel);
+    padding:7px 14px;border-radius:8px;
   }
+  .links a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
 
-  .wrap{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:0 24px}
-
-  /* ---------- hero ---------- */
-  header{padding:84px 0 56px;text-align:center}
-  .avatar{
-    width:112px;height:112px;border-radius:50%;
-    border:1px solid var(--line);
-    background:var(--bg-soft);
-    display:block;margin:0 auto 22px;
-  }
-  h1{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
-  .role{color:var(--muted);font-size:1.02rem;font-weight:500;margin:0 0 18px}
-  .tagline{
-    font-family:var(--mono);font-size:.8rem;color:var(--dim);
-    margin:0 auto 26px;max-width:620px;line-height:2;
-  }
-  .tagline span{color:var(--muted)}
-
-  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-  .btn{
-    display:inline-flex;align-items:center;gap:7px;
-    padding:9px 16px;border-radius:9px;
-    border:1px solid var(--line);background:var(--bg-soft);
-    color:var(--fg);text-decoration:none;
-    font-size:.86rem;font-weight:500;
-    transition:border-color .15s ease,background .15s ease,transform .15s ease;
-  }
-  .btn:hover{border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
-  .btn.primary{border-color:var(--accent);background:var(--accent-soft)}
-  .btn svg{width:15px;height:15px;fill:currentColor;flex:none}
-
-  /* ---------- sections ---------- */
-  section{padding:46px 0;border-top:1px solid var(--line-soft)}
+  /* sections */
+  section{padding:38px 0;border-top:1px solid var(--line-soft)}
   h2{
-    font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;
-    color:var(--dim);margin:0 0 22px;
+    font-family:var(--mono);font-size:.72rem;font-weight:500;
+    text-transform:uppercase;letter-spacing:.16em;color:var(--dim);
+    margin:0 0 6px;
   }
-  .lead{font-size:1rem;color:var(--muted);max-width:660px;margin:0 0 14px}
-  .lead strong{color:var(--fg);font-weight:600}
+  .hint{color:var(--dim);font-size:.82rem;margin:0 0 24px}
+  p{margin:0 0 14px}
 
-  /* domains */
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:12px}
-  .card{
-    border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--bg-soft);padding:16px 18px;
-    transition:border-color .15s ease,transform .15s ease;
+  /* case studies */
+  .case{padding:20px 0;border-bottom:1px solid var(--line-soft)}
+  .case:last-child{border-bottom:0;padding-bottom:0}
+  .case h3{font-size:1.02rem;font-weight:600;margin:0 0 4px}
+  .case .ctx{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin:0 0 12px}
+  .case dl{margin:0}
+  .case dt{
+    font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--dim);margin:12px 0 3px;
   }
-  .card:hover{border-color:#31343d;transform:translateY(-2px)}
-  .card h3{font-size:.92rem;font-weight:600;margin:0 0 6px;display:flex;align-items:center;gap:8px}
-  .card p{font-size:.84rem;color:var(--muted);margin:0;line-height:1.6}
-  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none}
+  .case dt:first-child{margin-top:0}
+  .case dd{margin:0;color:var(--muted);font-size:.93rem}
+  .case dd strong{color:var(--fg);font-weight:600}
 
-  /* projects */
-  .proj{
-    border:1px solid var(--line);border-radius:var(--radius);
-    background:var(--bg-soft);padding:18px 20px;margin-bottom:12px;
-    transition:border-color .15s ease;
-  }
-  .proj:hover{border-color:#31343d}
-  .proj-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:8px}
-  .proj h3{font-size:.98rem;font-weight:600;margin:0}
-  .proj .kind{font-family:var(--mono);font-size:.68rem;color:var(--dim);white-space:nowrap}
-  .proj p{font-size:.86rem;color:var(--muted);margin:0 0 12px;line-height:1.65}
-  .tags{display:flex;flex-wrap:wrap;gap:6px}
-  .tag{
-    font-family:var(--mono);font-size:.68rem;color:var(--muted);
-    border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:#15171c;
-  }
+  /* writing */
+  .piece{padding:13px 0;border-bottom:1px solid var(--line-soft)}
+  .piece:last-child{border-bottom:0}
+  .piece a{font-weight:500;font-size:.95rem}
+  .piece p{color:var(--muted);font-size:.88rem;margin:3px 0 0}
 
-  /* stack */
-  .stack-row{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
-  .stack-row:last-child{border-bottom:0}
-  .stack-label{
-    font-family:var(--mono);font-size:.72rem;color:var(--dim);
-    min-width:120px;padding-top:2px;flex:none;
-  }
-  .stack-items{display:flex;flex-wrap:wrap;gap:6px}
+  /* capabilities */
+  .cap{display:grid;grid-template-columns:132px 1fr;gap:10px 18px;align-items:baseline}
+  .cap dt{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+  .cap dd{margin:0;color:var(--muted);font-size:.9rem}
+  .cap dd b{color:var(--fg);font-weight:500}
 
-  /* contact */
-  footer{padding:46px 0 72px;border-top:1px solid var(--line-soft);text-align:center}
-  .note{font-size:.78rem;color:var(--dim);margin-top:26px}
-  .note a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)}
-  .note a:hover{color:var(--accent);border-color:var(--accent)}
+  footer{padding:38px 0 70px;border-top:1px solid var(--line-soft)}
+  footer p{color:var(--muted);font-size:.9rem}
+  .fine{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin-top:24px}
 
-  /* reveal on scroll */
-  .reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
-  .reveal.in{opacity:1;transform:none}
-  @media (prefers-reduced-motion:reduce){
-    .reveal{opacity:1;transform:none;transition:none}
-    html{scroll-behavior:auto}
-  }
-
-  @media (max-width:620px){
-    header{padding:56px 0 40px}
-    h1{font-size:1.72rem}
-    .tagline{font-size:.74rem}
-    .stack-label{min-width:100%}
+  @media (max-width:600px){
+    header{padding:48px 0 32px}
+    h1{font-size:1.5rem}
+    .id img{width:60px;height:60px}
+    .cap{grid-template-columns:1fr;gap:2px 0}
+    .cap dt{margin-top:10px}
   }
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
   <header>
-    <img class="avatar" src="https://wsrv.nl/?url=github.com/philliptran1402.png&w=300&h=300&fit=cover&mask=circle&maxage=7d" alt="Phi Tran" width="112" height="112" />
-    <h1>Phi Tran</h1>
-    <p class="role">Software Engineer · DeFi Infrastructure · Trading Systems</p>
-    <p class="tagline">
-      <span>Perp DEX</span> · <span>Lending</span> · <span>Options</span> · <span>RWA</span> · <span>On-chain data</span> · <span>AI agents</span><br />
-      Da Nang, Vietnam
+    <div class="id">
+      <img src="https://wsrv.nl/?url=github.com/philliptran1402.png&w=220&h=220&fit=cover&mask=circle&maxage=7d" alt="Phi Tran" width="72" height="72" />
+      <div>
+        <h1>Phi Tran</h1>
+        <p class="role">Backend &amp; DeFi Infrastructure Engineer</p>
+        <p class="where">Da Nang, Vietnam · 6+ years · open to remote</p>
+      </div>
+    </div>
+
+    <p class="pitch">
+      I build backend systems where <strong>a bug costs money</strong>, not just a bad user experience.
     </p>
-    <div class="actions">
-      <a class="btn primary" href="https://github.com/philliptran1402" target="_blank" rel="noopener">
-        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-      <a class="btn" href="https://linkedin.com/in/phitrantech" target="_blank" rel="noopener">
-        <svg viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
-        LinkedIn
-      </a>
-      <a class="btn" href="mailto:phitranviet99@gmail.com">
-        <svg viewBox="0 0 16 16"><path d="M.05 3.555A2 2 0 012 2h12a2 2 0 011.95 1.555L8 8.414.05 3.555zM0 4.697v7.104l5.803-3.558L0 4.697zM6.761 8.83l-6.57 4.027A2 2 0 002 14h12a2 2 0 001.808-1.144l-6.57-4.027L8 9.586l-1.239-.757zm3.436-.586L16 11.801V4.697l-5.803 3.546z"/></svg>
-        Email
-      </a>
+    <p class="sub">
+      Perpetual DEX, lending, options and RWA platforms; reorg-safe indexing; automated signing behind a
+      policy layer; and lately AI agents that plan on-chain actions without being trusted to sign them.
+    </p>
+
+    <div class="links">
+      <a href="https://github.com/philliptran1402">GitHub</a>
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+      <a href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
     </div>
   </header>
 
-  <section class="reveal">
-    <h2>About</h2>
-    <p class="lead">
-      Software engineer with <strong>6+ years</strong> building backend systems where a bug costs money —
-      not just a bad user experience.
+  <section>
+    <h2>Approach</h2>
+    <p>
+      Money-path systems fail differently from product systems. A dropped request is recoverable; a ledger
+      that is wrong in the wrong direction is not. So most of my design effort goes into the failure case
+      rather than the happy path — what happens on a reorg, a stale price, a duplicated retry, a compromised key.
     </p>
-    <p class="lead">
-      Most of my work sits on the <strong>money path</strong>: perpetual DEX backends, lending and options
-      integrations, RWA tokenization, reorg-safe indexers, automated signing and settlement. More recently
-      I build <strong>AI agents</strong> that plan and execute on top of that infrastructure.
+    <p>
+      The decisions below are the ones I would defend in a design review. Each of them cost something;
+      I have tried to say what.
     </p>
   </section>
 
-  <section class="reveal">
-    <h2>What I work on</h2>
-    <div class="grid">
-      <div class="card"><h3><span class="dot"></span>Perpetual DEX</h3><p>Order and position lifecycle, margin health, funding rates, liquidation monitoring, risk limits.</p></div>
-      <div class="card"><h3><span class="dot"></span>Lending</h3><p>Supply/borrow/liquidation indexing, real-time APY/APR, health-factor tracking, oracle handling.</p></div>
-      <div class="card"><h3><span class="dot"></span>Options &amp; Derivatives</h3><p>Series lifecycle, implied volatility and greeks, margin for short positions, expiry settlement.</p></div>
-      <div class="card"><h3><span class="dot"></span>RWA / Tokenization</h3><p>Compliance-gated transfers, KYC allowlists, NAV attestation, subscription and redemption flows.</p></div>
-      <div class="card"><h3><span class="dot"></span>On-chain data</h3><p>Reorg-safe pipelines, hash-chain verification, finality tiers, backfill plus realtime, subgraphs.</p></div>
-      <div class="card"><h3><span class="dot"></span>Keys &amp; signing</h3><p>Automated signing behind a policy engine, multisig and custody boundaries.</p></div>
-    </div>
-  </section>
-
-  <section class="reveal">
+  <section>
     <h2>Selected work</h2>
+    <p class="hint">Four decisions, with what each one traded away.</p>
 
-    <div class="proj">
-      <div class="proj-head"><h3>DeFi AI Agent</h3><span class="kind">agent · execution</span></div>
-      <p>LLM-driven agent that turns a trading intent into a safe on-chain action: strategy planning, quoting across venues, simulation before submission, and a policy layer gating every signature.</p>
-      <div class="tags"><span class="tag">TypeScript</span><span class="tag">NestJS</span><span class="tag">LLM tool-calling</span><span class="tag">EVM</span><span class="tag">PostgreSQL</span></div>
+    <div class="case">
+      <h3>Reorg-safe event indexer</h3>
+      <p class="ctx">on-chain data · settlement</p>
+      <dl>
+        <dt>Problem</dt>
+        <dd>An indexer that treats a recent block as final is a bug waiting for a reorg. Credit a deposit on data that later disappears and the ledger is wrong in the direction that loses money.</dd>
+        <dt>Approach</dt>
+        <dd>Verify the parent hash chain on every block rather than trusting block numbers. Store entities keyed by <strong>block range</strong> so a revert is a delete, not a repair. Tier confirmation policy by value — small amounts credit quickly, large amounts wait for finality.</dd>
+        <dt>Trade-off</dt>
+        <dd>Large deposits settle noticeably slower, and the schema is more complex than a flat table. Accepted deliberately: latency is recoverable, an incorrect balance is not.</dd>
+      </dl>
     </div>
 
-    <div class="proj">
-      <div class="proj-head"><h3>Perpetual DEX Backend</h3><span class="kind">trading · risk</span></div>
-      <p>Positions and margin health, funding accrual and settlement, liquidation monitoring with risk limits, realtime market data over WebSocket, reconciled against on-chain state.</p>
-      <div class="tags"><span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">Redis</span><span class="tag">Kafka</span><span class="tag">WebSocket</span></div>
+    <div class="case">
+      <h3>Automated signing behind a policy engine</h3>
+      <p class="ctx">keys · custody</p>
+      <dl>
+        <dt>Problem</dt>
+        <dd>A bot that signs without a human in the loop holds a hot key with the authority of the whole treasury. Protecting the key is not the same problem as constraining the <strong>decision to sign</strong>.</dd>
+        <dt>Approach</dt>
+        <dd>Separate the ability to sign from the authority to sign. A policy layer in front of the signer enforces per-action limits, destination allowlists and rate caps; anything outside policy escalates to a human instead of failing open.</dd>
+        <dt>Trade-off</dt>
+        <dd>More moving parts, and latency added to every transaction on the path. Bought in exchange: a bounded blast radius when — not if — something is compromised.</dd>
+      </dl>
     </div>
 
-    <div class="proj">
-      <div class="proj-head"><h3>Options / Derivatives Platform</h3><span class="kind">pricing · settlement</span></div>
-      <p>Option series lifecycle, implied-volatility surface and greeks per account, collateral and margin for short positions, oracle-driven expiry settlement with auto-exercise, and vault strategies.</p>
-      <div class="tags"><span class="tag">TypeScript</span><span class="tag">Solidity</span><span class="tag">PostgreSQL</span><span class="tag">Oracles</span></div>
+    <div class="case">
+      <h3>RPC gateway with head-lag detection</h3>
+      <p class="ctx">infrastructure · reliability</p>
+      <dl>
+        <dt>Problem</dt>
+        <dd>A single RPC URL is an invisible trust boundary. A provider serving a head from forty minutes ago does not return an error — it returns <strong>stale truth</strong>, and everything downstream acts on it confidently.</dd>
+        <dt>Approach</dt>
+        <dd>Every service talks to one internal gateway. It probes each upstream's head, marks any source too far behind as lagging, fails over on errors, caps <code>eth_getLogs</code> ranges and allowlists methods. When only stale sources remain it refuses to answer rather than answering wrongly.</dd>
+        <dt>Trade-off</dt>
+        <dd>An extra hop, plus a component that now has to be operated and monitored itself. Bought: the ability to detect the lie instead of discovering the consequence.</dd>
+      </dl>
     </div>
 
-    <div class="proj">
-      <div class="proj-head"><h3>RWA Tokenization Platform</h3><span class="kind">compliance · issuance</span></div>
-      <p>Transfer restrictions enforced in the contract, KYC allowlist and jurisdiction rules, subscription and redemption with T+N settlement, NAV attestation, and reconciliation against custodian records.</p>
-      <div class="tags"><span class="tag">Solidity</span><span class="tag">NestJS</span><span class="tag">PostgreSQL</span><span class="tag">KYC integration</span></div>
-    </div>
-
-    <div class="proj">
-      <div class="proj-head"><h3>EVM Arbitrage Bot</h3><span class="kind">latency · MEV</span></div>
-      <p>Multi-DEX price scanning, flashloan execution, multi-hop routing, private transaction submission and risk management on latency-sensitive paths.</p>
-      <div class="tags"><span class="tag">Rust</span><span class="tag">Solidity</span><span class="tag">Redis</span><span class="tag">PostgreSQL</span></div>
-    </div>
-
-    <div class="proj">
-      <div class="proj-head"><h3>Blockchain Event Indexer</h3><span class="kind">data · reliability</span></div>
-      <p>Event pipeline built to survive reorgs, not just to be fast: block hash-chain verification, rollback-able schema, value-based finality tiers, idempotent writes, paced backfill alongside realtime.</p>
-      <div class="tags"><span class="tag">Node.js</span><span class="tag">Kafka</span><span class="tag">PostgreSQL</span><span class="tag">Redis</span></div>
-    </div>
-
-    <div class="proj">
-      <div class="proj-head"><h3>Self-hosted Web3 Infrastructure</h3><span class="kind">infra · cost</span></div>
-      <p>Running the infrastructure instead of trusting one vendor endpoint: an RPC gateway with multi-upstream routing, head-lag detection, failover and method allowlisting, plus self-hosted subgraphs on graph-node.</p>
-      <div class="tags"><span class="tag">Go</span><span class="tag">Docker</span><span class="tag">graph-node</span><span class="tag">IPFS</span></div>
+    <div class="case">
+      <h3>AI agent with deterministic guardrails</h3>
+      <p class="ctx">agents · execution</p>
+      <dl>
+        <dt>Problem</dt>
+        <dd>A language model planning on-chain actions is useful precisely because it is not deterministic — which is the same reason it cannot be trusted with a signature.</dd>
+        <dt>Approach</dt>
+        <dd>The model proposes, deterministic code disposes: intent, strategy, quotes across venues, simulation, policy check, then signing. Every step the model touches is replayable, and a model-initiated action passes the <strong>same policy layer</strong> a human-initiated one would.</dd>
+        <dt>Trade-off</dt>
+        <dd>The agent is slower and narrower than letting it call tools freely, and a good deal of its output is rejected before execution. That is the design working, not the design failing.</dd>
+      </dl>
     </div>
   </section>
 
-  <section class="reveal">
-    <h2>Stack</h2>
-    <div class="stack-row">
-      <div class="stack-label">Languages</div>
-      <div class="stack-items"><span class="tag">TypeScript</span><span class="tag">Solidity</span><span class="tag">Rust</span><span class="tag">Go</span><span class="tag">C#</span></div>
+  <section>
+    <h2>Writing</h2>
+    <p class="hint">Research notes from reading protocols at the source rather than from summaries.</p>
+
+    <!-- TODO: repoint these to the published URLs once phillip-tech-labs is public. -->
+    <div class="piece">
+      <a href="https://github.com/philliptran1402">Three perpetual DEX architectures, compared</a>
+      <p>GMX settles trades against a shared liquidity pool, Hyperliquid runs a fully on-chain order book on its own L1, and Nado keeps matching off-chain with the risk engine on-chain. Three answers to the same constraint, with different things to trust.</p>
     </div>
-    <div class="stack-row">
-      <div class="stack-label">Backend</div>
-      <div class="stack-items"><span class="tag">Node.js</span><span class="tag">NestJS</span><span class="tag">Gin</span><span class="tag">ASP.NET Core</span></div>
+    <div class="piece">
+      <a href="https://github.com/philliptran1402">Self-hosting an EVM node, and the gateway that belongs in front of it</a>
+      <p>What running an execution and consensus client actually requires, when self-hosting beats a provider, and why the gateway — not the node — is what makes the setup trustworthy.</p>
     </div>
-    <div class="stack-row">
-      <div class="stack-label">Blockchain</div>
-      <div class="stack-items"><span class="tag">EVM</span><span class="tag">Foundry</span><span class="tag">Hardhat</span><span class="tag">viem / ethers.js</span><span class="tag">The Graph</span><span class="tag">Chainlink</span><span class="tag">Pyth</span><span class="tag">Safe</span></div>
-    </div>
-    <div class="stack-row">
-      <div class="stack-label">Data</div>
-      <div class="stack-items"><span class="tag">PostgreSQL</span><span class="tag">Redis</span><span class="tag">Kafka</span><span class="tag">MongoDB</span><span class="tag">Elasticsearch</span></div>
-    </div>
-    <div class="stack-row">
-      <div class="stack-label">AI / LLM</div>
-      <div class="stack-items"><span class="tag">Claude API</span><span class="tag">OpenAI</span><span class="tag">Agents</span><span class="tag">RAG</span><span class="tag">Evals</span></div>
-    </div>
-    <div class="stack-row">
-      <div class="stack-label">Infra</div>
-      <div class="stack-items"><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">AWS</span><span class="tag">Terraform</span><span class="tag">Datadog</span><span class="tag">Grafana</span></div>
+    <div class="piece">
+      <a href="https://github.com/philliptran1402">What graph-node actually does when you deploy a subgraph</a>
+      <p>Entity versions keyed by block range, reorg reverts, proofs of indexing, and the point where a subgraph stops being the right tool and a custom indexer starts.</p>
     </div>
   </section>
 
-  <footer class="reveal">
-    <h2>Get in touch</h2>
-    <div class="actions">
-      <a class="btn primary" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
-      <a class="btn" href="https://linkedin.com/in/phitrantech" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn" href="https://github.com/philliptran1402" target="_blank" rel="noopener">GitHub</a>
-    </div>
-    <p class="note">
-      Built as a single static file · source on <a href="https://github.com/philliptran1402/philliptran1402.github.io" target="_blank" rel="noopener">GitHub</a>
+  <section>
+    <h2>Capabilities</h2>
+    <dl class="cap">
+      <dt>Domains</dt>
+      <dd>Perpetual DEX · lending · options &amp; derivatives · RWA tokenization · AMM/DEX tooling · payments &amp; settlement</dd>
+
+      <dt>Languages</dt>
+      <dd><b>TypeScript</b>, <b>Go</b>, <b>Rust</b>, Solidity, C#</dd>
+
+      <dt>Backend</dt>
+      <dd>Node.js / NestJS, Gin, ASP.NET Core · PostgreSQL, Redis, Kafka</dd>
+
+      <dt>Blockchain</dt>
+      <dd>EVM, Foundry, viem / ethers.js, The Graph, Chainlink &amp; Pyth oracles, Safe</dd>
+
+      <dt>AI</dt>
+      <dd>LLM application engineering — agent orchestration, tool calling, RAG, evals</dd>
+
+      <dt>Infrastructure</dt>
+      <dd>Docker, Kubernetes, AWS, Terraform · Datadog, Grafana, Sentry</dd>
+    </dl>
+  </section>
+
+  <footer>
+    <h2>Contact</h2>
+    <p>
+      Open to senior and lead roles on backend or DeFi infrastructure, remote.
+      Reach me at <a href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+      or on <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>.
+    </p>
+    <p class="fine">
+      Hand-written static HTML, no build step ·
+      <a href="https://github.com/philliptran1402/philliptran1402.github.io">source</a>
     </p>
   </footer>
 
 </div>
-
-<script>
-  // reveal sections as they enter the viewport
-  var els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) {
-    els.forEach(function (el) { el.classList.add('in'); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
-    els.forEach(function (el) { io.observe(el); });
-  }
-</script>
-
 </body>
 </html>
