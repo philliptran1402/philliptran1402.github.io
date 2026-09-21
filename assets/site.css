@@ -276,12 +276,6 @@ html.cur-on .cur-ring{width:46px;height:46px;margin:-23px 0 0 -23px}
 html.cur-on .cur-ring::before,html.cur-on .cur-ring::after{border-color:var(--acc)}
 html.cur-down .cur-ring{width:24px;height:24px;margin:-12px 0 0 -12px}
 
-/* ═══ SOUND TOGGLE (HUD) ═════════════════════════ */
-.hud .snd{position:absolute;left:44%;top:26px;background:none;border:0;padding:0;font:inherit;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);cursor:pointer;animation-delay:.61s}
-.hud .snd:hover{color:var(--fg)}
-.hud .snd b{font-weight:500;color:var(--dim)}
-.hud .snd[aria-pressed="true"] b{color:var(--acc)}
-@media (max-width:900px){.hud .snd{display:none}}
 
 @media (prefers-reduced-motion:reduce){
   .cur-dot,.cur-ring{display:none}

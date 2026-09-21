@@ -16,6 +16,7 @@ or a post means editing JSON and re-running this, which is the reason it
 exists: twenty hand-written pages drift, one template does not.
 """
 
+import hashlib
 import html
 import json
 import re
@@ -28,6 +29,10 @@ POSTS = ROOT / "tools" / "posts.json"
 WORK = ROOT / "work"
 BLOG = ROOT / "blog"
 
+ASSET_V = hashlib.md5(
+    (ROOT / "assets" / "site.css").read_bytes()
+    + (ROOT / "assets" / "site.js").read_bytes()
+).hexdigest()[:8]
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 CATS = [("case", "Case study"), ("research", "Protocol research"), ("lab", "Runnable lab")]
 
@@ -56,7 +61,7 @@ def head(title, desc, css_depth, canonical):
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="{up}assets/site.css" />
+<link rel="stylesheet" href="{up}assets/site.css?v={ASSET_V}" />
 </head>
 <body>
 
@@ -69,7 +74,6 @@ def head(title, desc, css_depth, canonical):
     Phi Tran
   </a>
   <div class="sys">System — <b>Online</b><span class="dot"></span></div>
-  <button class="snd" id="snd" aria-pressed="false">Sound — <b>Off</b></button>
   <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
   <div class="geo">16°03'16"N<br />108°12'08"E</div>
   <button class="menu-btn" id="open">Menu</button>
@@ -104,7 +108,7 @@ def tail(css_depth, about, work, blog=None):
   <p class="panel-foot">© 2026 by Phi Tran</p>
 </div>
 
-<script src="{up}assets/site.js"></script>
+<script src="{up}assets/site.js?v={ASSET_V}"></script>
 </body>
 </html>
 """

@@ -147,19 +147,16 @@
   }
 
   /* ── sound ───────────────────────────────────────
-     Tones are synthesised with the Web Audio API — no audio files, no CDN.
-     Off by default: browsers block autoplay, and a site that makes noise
-     uninvited gets closed. The choice persists in localStorage.           */
-  var sndBtn = document.getElementById('snd');
-  if (sndBtn) {
-    var on = false, ctx = null, lastTick = 0;
-    try { on = localStorage.getItem('snd') === 'on'; } catch (e) {}
+     On by default, no visible toggle. Tones are synthesised with the Web
+     Audio API — no files, no CDN.
 
-    var paint = function () {
-      sndBtn.innerHTML = 'Sound — <b>' + (on ? 'On' : 'Off') + '</b>';
-      sndBtn.setAttribute('aria-pressed', String(on));
-    };
-    paint();
+     Browsers will NOT produce sound before the visitor interacts with the
+     page; that is an autoplay policy, not something code can bypass. So the
+     AudioContext is created on the first real gesture and everything after
+     that is audible. Press M to mute — the choice persists.              */
+  (function () {
+    var on = true, ctx = null, lastTick = 0;
+    try { if (localStorage.getItem('snd') === 'off') on = false; } catch (e) {}
 
     var beep = function (freq, dur, vol, type) {
       if (!on) return;
@@ -170,26 +167,17 @@
         o.type = type || 'sine';
         o.frequency.setValueAtTime(freq, now);
         g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(vol, now + 0.008);   // short attack
+        g.gain.linearRampToValueAtTime(vol, now + 0.008);
         g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
         o.connect(g); g.connect(ctx.destination);
         o.start(now); o.stop(now + dur + 0.02);
-      } catch (e) { /* audio unavailable — silently ignore */ }
+      } catch (e) { /* audio unavailable — ignore */ }
     };
 
-    sndBtn.addEventListener('click', function () {
-      on = !on;
-      try { localStorage.setItem('snd', on ? 'on' : 'off'); } catch (e) {}
-      paint();
-      if (on) { beep(880, 0.07, 0.05); setTimeout(function () { beep(1320, 0.09, 0.045); }, 70); }
-    });
-
-    // hover tick, throttled so a fast sweep across links does not machine-gun
     document.addEventListener('mouseover', function (e) {
-      if (!on || !e.target.closest) return;
-      if (!e.target.closest('a,button')) return;
+      if (!on || !e.target.closest || !e.target.closest('a,button')) return;
       var t = Date.now();
-      if (t - lastTick < 110) return;
+      if (t - lastTick < 110) return;          // throttle: no machine-gunning
       lastTick = t;
       beep(1500, 0.028, 0.022, 'square');
     }, { passive: true });
@@ -198,8 +186,16 @@
       if (!on || !e.target.closest) return;
       if (e.target.closest('a,button')) beep(660, 0.06, 0.04, 'triangle');
     }, { passive: true });
-  }
 
+    // escape hatch: M mutes / unmutes
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'm' && e.key !== 'M') return;
+      if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+      on = !on;
+      try { localStorage.setItem('snd', on ? 'on' : 'off'); } catch (err) {}
+      if (on) beep(880, 0.07, 0.05);
+    });
+  })();
 
   /* ── copy to clipboard ───────────────────────────
      Any [data-copy] button copies its value and confirms in place. Falls back
