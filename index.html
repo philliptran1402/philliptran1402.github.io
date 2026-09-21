@@ -14,7 +14,10 @@
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Phi Tran — Backend &amp; DeFi Infrastructure Engineer" />
 <meta name="twitter:image" content="https://github.com/philliptran1402.png" />
-<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<link rel="alternate icon" href="assets/favicon.png" sizes="64x64" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#0b0c10" />
 <link rel="canonical" href="https://philliptran1402.github.io/" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,7 +26,9 @@
 <style>
   /* home-only */
   .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,4.4vh,52px);padding:104px 0 26px;position:relative}
-  .hero .mail{position:absolute;left:0;top:88px;font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;color:#25282d;text-transform:uppercase;border-left:1px solid var(--line-hard);padding-left:14px}
+  .hero .mail{position:absolute;left:0;top:88px;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;border-left:1px solid var(--acc);padding-left:14px}
+  .hero .mail a{color:var(--muted);transition:color .18s}
+  .hero .mail a:hover{color:var(--acc)}
   .intro{max-width:600px;margin:0;font-size:1.02rem;line-height:1.82;color:var(--muted);opacity:0;animation:hudIn .9s var(--ease) 1.25s forwards}
   .intro b{color:var(--fg);font-weight:500}
   .intro code{font-family:var(--mono);font-size:.9em;color:var(--acc)}
@@ -62,6 +67,7 @@
     Phi Tran
   </a>
   <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <button class="snd" id="snd" aria-pressed="false">Sound — <b>Off</b></button>
   <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
   <div class="geo">16°03'16"N<br />108°12'08"E</div>
   <button class="menu-btn" id="open">Menu</button>
@@ -73,7 +79,10 @@
 <div class="wrap">
 
   <div class="hero">
-    <div class="mail">phitranviet99 &nbsp; @gmail.com</div>
+    <div class="mail">
+      <a href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+      <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+    </div>
 
     <div class="portrait">
       <img src="https://wsrv.nl/?url=github.com/philliptran1402.png&w=700&h=933&fit=cover&maxage=7d" alt="Phi Tran" />
@@ -245,7 +254,10 @@
 
   <footer id="contact">
     <p class="lab rv">05 — Contact</p>
-    <a class="big-mail rv rv-d1" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <div class="rv rv-d1 mail-row">
+      <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+      <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+    </div>
     <div class="foot-row rv rv-d2">
       <span>Open to senior &amp; lead roles · remote</span>
       <span>

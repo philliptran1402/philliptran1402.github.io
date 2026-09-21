@@ -48,7 +48,10 @@ def head(title, desc, css_depth, canonical):
 <meta property="og:description" content="{html.escape(desc)}" />
 <meta property="og:image" content="https://github.com/philliptran1402.png" />
 <meta name="twitter:card" content="summary" />
-<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="icon" href="{up}assets/favicon.svg" type="image/svg+xml" />
+<link rel="alternate icon" href="{up}assets/favicon.png" sizes="64x64" />
+<link rel="apple-touch-icon" href="{up}assets/apple-touch-icon.png" />
+<meta name="theme-color" content="#0b0c10" />
 <link rel="canonical" href="https://philliptran1402.github.io/{canonical}" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -66,6 +69,7 @@ def head(title, desc, css_depth, canonical):
     Phi Tran
   </a>
   <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <button class="snd" id="snd" aria-pressed="false">Sound — <b>Off</b></button>
   <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
   <div class="geo">16°03'16"N<br />108°12'08"E</div>
   <button class="menu-btn" id="open">Menu</button>
@@ -164,7 +168,10 @@ def build_index(projects):
 
 <footer class="wrap">
   <p class="lab">Contact</p>
-  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="mail-row">
+    <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+  </div>
   <div class="foot-row">
     <span><a href="../">← Back home</a></span>
     <span>
@@ -245,7 +252,10 @@ def build_detail(p, prev_p, next_p, by_slug):
 
 <footer class="wrap">
   <p class="lab">Contact</p>
-  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="mail-row">
+    <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+  </div>
   <div class="foot-row">
     <span><a href="../">← All work</a></span>
     <span>
@@ -314,7 +324,10 @@ def build_blog_index(posts):
 
 <footer class="wrap">
   <p class="lab">Contact</p>
-  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="mail-row">
+    <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+  </div>
   <div class="foot-row">
     <span><a href="../">← Back home</a></span>
     <span>
@@ -366,7 +379,10 @@ def build_post(p, prev_p, next_p):
 
 <footer class="wrap">
   <p class="lab">Contact</p>
-  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="mail-row">
+    <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <button class="copy" data-copy="phitranviet99@gmail.com" aria-label="Copy email address">Copy</button>
+  </div>
   <div class="foot-row">
     <span><a href="../">← All posts</a></span>
     <span>

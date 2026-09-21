@@ -108,6 +108,125 @@
     });
   }
 
+
+  /* ── custom cursor ───────────────────────────────
+     A dot that tracks exactly plus a reticle that lags behind. Enabled only
+     on fine-pointer devices and only from JS, so the native cursor survives
+     a script failure. Disabled entirely under reduced motion.             */
+  var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (fine && !reduced) {
+    var dot = document.createElement('div'); dot.className = 'cur-dot';
+    var ring = document.createElement('div'); ring.className = 'cur-ring';
+    document.body.appendChild(dot); document.body.appendChild(ring);
+    document.documentElement.classList.add('cur');
+
+    var mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+    addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = 'translate(' + mx + 'px,' + my + 'px)';
+    }, { passive: true });
+
+    (function loop() {
+      rx += (mx - rx) * 0.16;            // lerp: the reticle trails the dot
+      ry += (my - ry) * 0.16;
+      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
+      requestAnimationFrame(loop);
+    })();
+
+    var root = document.documentElement;
+    addEventListener('mouseover', function (e) {
+      if (e.target.closest && e.target.closest('a,button')) root.classList.add('cur-on');
+    }, { passive: true });
+    addEventListener('mouseout', function (e) {
+      if (e.target.closest && e.target.closest('a,button')) root.classList.remove('cur-on');
+    }, { passive: true });
+    addEventListener('mousedown', function () { root.classList.add('cur-down'); }, { passive: true });
+    addEventListener('mouseup', function () { root.classList.remove('cur-down'); }, { passive: true });
+    addEventListener('mouseleave', function () { dot.style.opacity = ring.style.opacity = '0'; });
+    addEventListener('mouseenter', function () { dot.style.opacity = ring.style.opacity = ''; });
+  }
+
+  /* ── sound ───────────────────────────────────────
+     Tones are synthesised with the Web Audio API — no audio files, no CDN.
+     Off by default: browsers block autoplay, and a site that makes noise
+     uninvited gets closed. The choice persists in localStorage.           */
+  var sndBtn = document.getElementById('snd');
+  if (sndBtn) {
+    var on = false, ctx = null, lastTick = 0;
+    try { on = localStorage.getItem('snd') === 'on'; } catch (e) {}
+
+    var paint = function () {
+      sndBtn.innerHTML = 'Sound — <b>' + (on ? 'On' : 'Off') + '</b>';
+      sndBtn.setAttribute('aria-pressed', String(on));
+    };
+    paint();
+
+    var beep = function (freq, dur, vol, type) {
+      if (!on) return;
+      try {
+        if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended') ctx.resume();
+        var o = ctx.createOscillator(), g = ctx.createGain(), now = ctx.currentTime;
+        o.type = type || 'sine';
+        o.frequency.setValueAtTime(freq, now);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(vol, now + 0.008);   // short attack
+        g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(now); o.stop(now + dur + 0.02);
+      } catch (e) { /* audio unavailable — silently ignore */ }
+    };
+
+    sndBtn.addEventListener('click', function () {
+      on = !on;
+      try { localStorage.setItem('snd', on ? 'on' : 'off'); } catch (e) {}
+      paint();
+      if (on) { beep(880, 0.07, 0.05); setTimeout(function () { beep(1320, 0.09, 0.045); }, 70); }
+    });
+
+    // hover tick, throttled so a fast sweep across links does not machine-gun
+    document.addEventListener('mouseover', function (e) {
+      if (!on || !e.target.closest) return;
+      if (!e.target.closest('a,button')) return;
+      var t = Date.now();
+      if (t - lastTick < 110) return;
+      lastTick = t;
+      beep(1500, 0.028, 0.022, 'square');
+    }, { passive: true });
+
+    document.addEventListener('click', function (e) {
+      if (!on || !e.target.closest) return;
+      if (e.target.closest('a,button')) beep(660, 0.06, 0.04, 'triangle');
+    }, { passive: true });
+  }
+
+
+  /* ── copy to clipboard ───────────────────────────
+     Any [data-copy] button copies its value and confirms in place. Falls back
+     to a hidden textarea where the async Clipboard API is unavailable (it
+     needs a secure context, which file:// is not).                        */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('.copy');
+    if (!btn) return;
+    e.preventDefault();
+    var text = btn.dataset.copy || '';
+    var done = function () {
+      var old = btn.textContent;
+      btn.textContent = 'Copied';
+      btn.classList.add('done');
+      setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1600);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, function () {});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (err) {}
+      ta.remove();
+    }
+  });
+
   /* ── work page: category filter ──────────────────── */
   var filters = document.querySelectorAll('.filters button');
   var cards = document.querySelectorAll('.card');
