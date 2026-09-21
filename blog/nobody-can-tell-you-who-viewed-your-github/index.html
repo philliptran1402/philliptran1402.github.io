@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nobody can tell you who viewed your GitHub profile — Phi Tran</title>
+<meta name="description" content="There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/blog/nobody-can-tell-you-who-viewed-your-github/" />
+<meta property="og:title" content="Nobody can tell you who viewed your GitHub profile — Phi Tran" />
+<meta property="og:description" content="There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/blog/nobody-can-tell-you-who-viewed-your-github/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Blog</a> <span>/</span> Note</p>
+    <div class="post-meta" style="margin-bottom:6px">
+      <span class="post-date">20 Sep 2026</span>
+      <span class="post-time">2 min read</span>
+    </div>
+    <h1 class="detail-title">Nobody can tell you who viewed your GitHub profile</h1>
+    <p class="detail-sum">There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable.</p>
+  </div>
+
+  <section class="rv">
+    <div class="prose"><p>I went looking for a way to see who had been visiting my GitHub profile. The short answer is that it does not exist, and the reason it does not exist is more interesting than the question.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">Why the counter badge cannot know</p>
+    <div class="prose"><p>Those <code>Profile views: N</code> badges are third-party image endpoints that increment on each request. They produce a count, never an identity — and the count is approximate.</p><p>The mechanism is the reason: GitHub proxies every image in rendered Markdown through its own camo service. The server behind the badge sees a request from GitHub's proxy, not from the person reading the page. No visitor IP, no user agent, nothing to identify.</p><p>That same proxy is why the classic tracking-pixel trick does not work here. It is not a gap waiting to be exploited; it is the point of the design.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What is actually measurable</p>
+    <div class="prose"><p><b>Followers, stargazers, watchers, forkers.</b> Real names, and a much stronger signal than a view — someone took an action.</p><p><b>Repository traffic insights.</b> Under Insights → Traffic, for repositories you can push to: views, unique visitors, and referring sites, for the last fourteen days. Counts only, no identities.</p><p>The referrer column is the useful one. Knowing that traffic came from LinkedIn rather than from a search is more actionable than knowing one stranger's username.</p><p><b>LinkedIn</b> is the only platform in this stack that genuinely answers "who looked at me", which is worth remembering when deciding where to spend effort.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">The result that actually mattered</p>
+    <div class="prose"><p>I pulled my own numbers expecting to tune something. Views across my repositories over fourteen days: zero. Followers: five, of which four were my own alternate accounts.</p><p>No amount of analytics fixes that, because there was nothing to analyse. The problem was not measurement, it was that the work worth looking at was sitting in a private repository.</p><p>Which is the actual lesson: instrumentation is useful once there is traffic. Before that, it is a way to feel productive while avoiding the harder task of publishing something.</p></div>
+  </section>
+
+  <nav class="pager">
+    <a href="../half-the-portfolio-advice-did-not-survive-checking/">← Half the portfolio advice I checked did not </a>
+    <a href="../">All posts</a>
+    <a href="../multisig-protects-against-a-stolen-key/">A multisig protects against a stolen key, no →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All posts</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../../work/">WORK</a>
+    <a href="../">BLOG</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

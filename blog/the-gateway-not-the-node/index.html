@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The gateway, not the node, is what makes self-hosting trustworthy — Phi Tran</title>
+<meta name="description" content="Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/blog/the-gateway-not-the-node/" />
+<meta property="og:title" content="The gateway, not the node, is what makes self-hosting trustworthy — Phi Tran" />
+<meta property="og:description" content="Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/blog/the-gateway-not-the-node/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Blog</a> <span>/</span> Infrastructure</p>
+    <div class="post-meta" style="margin-bottom:6px">
+      <span class="post-date">08 Sep 2026</span>
+      <span class="post-time">2 min read</span>
+    </div>
+    <h1 class="detail-title">The gateway, not the node, is what makes self-hosting trustworthy</h1>
+    <p class="detail-sum">Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too.</p>
+  </div>
+
+  <section class="rv">
+    <div class="prose"><p>The self-hosting conversation usually runs on cost. Compute units get expensive, <code>eth_getLogs</code> is priced like a luxury good, so you run your own node and the bill flattens out.</p><p>That reasoning is fine and it misses the failure that actually costs money.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">Five ways a provider URL hurts you</p>
+    <div class="prose"><p>A single RPC endpoint can: <b>lie</b> by serving a head from forty minutes ago, <b>rate-limit</b> you in the middle of a volatile market, <b>reprice</b> as you scale, <b>observe</b> every address you care about, and <b>add latency</b> by living on another continent.</p><p>Self-hosting fixes four of those. It does not fix the first one — because your own node lags too, crashes too, and needs patching on fork day like everything else.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">A lying upstream returns 200</p>
+    <div class="prose"><p>This is what makes staleness nastier than downtime. An endpoint that is down returns an error and your retry logic handles it. An endpoint that is behind returns a valid response with old data, and every consumer downstream acts on it confidently.</p><p>A node cannot detect its own lag either. <code>eth_syncing</code> returning false means the node believes it is caught up. A node isolated from its peers believes that too, at a head from an hour ago.</p><p><b>The only way to detect it is to compare against a second source.</b> That is an architectural property, not a configuration flag — which is why no amount of node tuning gets you there.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What the gateway does</p>
+    <div class="prose"><p>Every service talks to one internal URL. Behind it: probe each upstream's head on a short interval, mark anything too far behind the best as lagging and route around it, fail over on errors, cap <code>eth_getLogs</code> ranges before they reach a node, allowlist methods so <code>admin_</code> and <code>debug_</code> are unreachable, and rate-limit so one buggy loop cannot take the node down.</p><p>The design decision worth defending: <b>when only lagging sources remain, refuse to answer.</b> For anything that signs transactions, an error is recoverable and a stale answer is not.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">The shape of the answer</p>
+    <div class="prose"><p>Self-host for cost, privacy and latency. Put a gateway in front for correctness. Keep a provider as a fallback upstream rather than as the primary.</p><p>Hybrid is not a compromise here — it is the only arrangement where you can tell that one of your sources is wrong.</p></div>
+  </section>
+
+  <nav class="pager">
+    <a href="../multisig-protects-against-a-stolen-key/">← A multisig protects against a stolen key, no</a>
+    <a href="../">All posts</a>
+    <a href="../subgraph-read-side-indexer-money-path/">Subgraph for the read side, custom indexer f →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All posts</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../../work/">WORK</a>
+    <a href="../">BLOG</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

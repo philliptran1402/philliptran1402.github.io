@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A multisig protects against a stolen key, not against every signer being shown the same lie — Phi Tran</title>
+<meta name="description" content="Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/blog/multisig-protects-against-a-stolen-key/" />
+<meta property="og:title" content="A multisig protects against a stolen key, not against every signer being shown the same lie — Phi Tran" />
+<meta property="og:description" content="Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/blog/multisig-protects-against-a-stolen-key/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Blog</a> <span>/</span> Security</p>
+    <div class="post-meta" style="margin-bottom:6px">
+      <span class="post-date">17 Sep 2026</span>
+      <span class="post-time">2 min read</span>
+    </div>
+    <h1 class="detail-title">A multisig protects against a stolen key, not against every signer being shown the same lie</h1>
+    <p class="detail-sum">Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times.</p>
+  </div>
+
+  <section class="rv">
+    <div class="prose"><p>Smart-contract multisigs are the default custody answer for treasuries, and they are a good one. They are also routinely described as protecting against a class of attack they do not touch.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What the contract actually checks</p>
+    <div class="prose"><p>Signatures are gathered off-chain and verified on-chain in one call. The contract confirms that enough valid signatures exist over a specific transaction hash. That is the whole guarantee, and it is a strong one: an attacker with one key cannot move anything.</p><p>Note what it does not check — whether the signers understood what they were signing.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">Two failure modes, same outcome</p>
+    <div class="prose"><p><b>Concentration.</b> Ronin had enough valid signatures because too few parties controlled too many keys. The threshold was met exactly as designed; the independence it assumed was not there.</p><p><b>Deception.</b> The 2025 Bybit incident is sharper. No key was broken and every signature was valid. The signing interface showed signers a benign transaction while their devices signed a different hash. M-of-N worked perfectly and approved a forgery M times.</p><p>Threshold signing assumes each signer independently verifies. If they all verify through the same compromised surface, N signatures carry the information of one.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">The part people miss in the contract</p>
+    <div class="prose"><p>Safe supports <b>Modules</b>: contracts authorised to execute through the Safe while bypassing the threshold check entirely. That is the feature — spending limits, recovery flows, session keys — and it is also a second authority path that a reviewer looking only at owners and threshold will not see.</p><p>Auditing a multisig means auditing its modules. "It's 3-of-5" describes one of the ways funds can move, not all of them.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What actually closes the gap</p>
+    <div class="prose"><p>Verify the transaction hash independently of the interface proposing it — a second device, a different client, anything not sharing a compromise with the first.</p><p>And for automated flows, put policy in a <b>Guard</b>, which runs before and after every transaction on the signing path and can revert even when signatures are valid. That is where limits and allowlists belong: in the contract, not in the frontend that might be lying to everyone at once.</p></div>
+  </section>
+
+  <nav class="pager">
+    <a href="../nobody-can-tell-you-who-viewed-your-github/">← Nobody can tell you who viewed your GitHub p</a>
+    <a href="../">All posts</a>
+    <a href="../the-gateway-not-the-node/">The gateway, not the node, is what makes sel →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All posts</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../../work/">WORK</a>
+    <a href="../">BLOG</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

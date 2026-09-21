@@ -242,3 +242,17 @@ footer{border-top:1px solid var(--line);padding:76px 0 60px;position:relative;z-
 .pager{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line);padding:34px 0 10px;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .pager a{color:var(--muted);transition:color .18s}
 .pager a:hover{color:var(--acc)}
+
+/* ═══ BLOG ═══════════════════════════════════════ */
+.posts{border-top:1px solid var(--line);margin-top:10px;padding-bottom:90px}
+.post{display:block;position:relative;padding:30px 0;border-bottom:1px solid var(--line);transition:padding-left .28s var(--ease)}
+.post:hover{padding-left:12px}
+.post-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.post-tag{border:1px solid var(--line-hard);padding:3px 9px;color:var(--acc)}
+.post-time{margin-left:auto}
+.post-title{font-size:clamp(1.15rem,2.6vw,1.62rem);font-weight:300;letter-spacing:-.02em;line-height:1.25;margin:0 0 9px;max-width:780px;transition:color .2s}
+.post:hover .post-title{color:var(--acc)}
+.post-ex{margin:0;color:var(--muted);font-size:.94rem;max-width:720px;line-height:1.68}
+.post-go{display:inline-block;margin-top:13px;font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);transition:color .2s,transform .25s var(--ease)}
+.post:hover .post-go{color:var(--acc);transform:translateX(4px)}
+@media (max-width:640px){.post-time{margin-left:0}}

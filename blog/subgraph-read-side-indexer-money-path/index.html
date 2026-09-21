@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Subgraph for the read side, custom indexer for the money path — Phi Tran</title>
+<meta name="description" content="A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/blog/subgraph-read-side-indexer-money-path/" />
+<meta property="og:title" content="Subgraph for the read side, custom indexer for the money path — Phi Tran" />
+<meta property="og:description" content="A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/blog/subgraph-read-side-indexer-money-path/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Blog</a> <span>/</span> Architecture</p>
+    <div class="post-meta" style="margin-bottom:6px">
+      <span class="post-date">08 Sep 2026</span>
+      <span class="post-time">2 min read</span>
+    </div>
+    <h1 class="detail-title">Subgraph for the read side, custom indexer for the money path</h1>
+    <p class="detail-sum">A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg.</p>
+  </div>
+
+  <section class="rv">
+    <div class="prose"><p>Every team indexing chain data eventually asks whether to write a subgraph or build their own indexer. The usual framing is convenience against control, and that framing produces the wrong answer about half the time.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What a subgraph gives you for free</p>
+    <div class="prose"><p>Deploy a manifest, a schema and some mappings, and graph-node handles ingestion, storage and a GraphQL API. Two things it handles that people underestimate:</p><p><b>Reorgs.</b> Entities are stored as versions keyed by block range, so reverting a fork is deleting versions rather than repairing rows. You write no reorg code.</p><p><b>Time travel.</b> Querying state as of block N falls straight out of the same design.</p><p>Both are genuinely hard to build well, and getting them free is a real argument.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">What it takes away</p>
+    <div class="prose"><p>Mappings must be deterministic: no clock, no randomness, no HTTP calls. GraphQL is fixed — no arbitrary aggregation, no joins against your off-chain tables. A schema change means re-indexing from scratch.</p><p>Each of those is survivable for a dashboard. None of them is survivable for a ledger.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">The deciding question</p>
+    <div class="prose"><p>Not "which is easier" but <b>what happens to this data during a reorg</b>.</p><p>For a transaction history view: entities vanish and reappear over a few seconds, a chart twitches, nobody loses anything. Perfect fit.</p><p>For a balance that determines whether a withdrawal is allowed: the same revert silently changes the number your business logic just read. That is not a rendering artifact, it is a financial one — and it needs a confirmation policy tiered by value, an idempotent ledger and an audit trail, none of which a subgraph is built to express.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">The rule</p>
+    <div class="prose"><p><b>Subgraph for the read side, custom indexer for the money path.</b> Both reading the same chain, neither acting as the other's source of truth.</p><p>In practice that also means the display balance and the spendable balance are allowed to disagree briefly — and the system has to be honest about which one it is showing.</p></div>
+  </section>
+
+  <nav class="pager">
+    <a href="../the-gateway-not-the-node/">← The gateway, not the node, is what makes sel</a>
+    <a href="../">All posts</a>
+    <span></span>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All posts</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../../work/">WORK</a>
+    <a href="../">BLOG</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

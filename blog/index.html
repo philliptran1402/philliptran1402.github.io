@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Blog — Phi Tran</title>
+<meta name="description" content="Notes on protocol internals, infrastructure decisions and verification." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/blog/" />
+<meta property="og:title" content="Blog — Phi Tran" />
+<meta property="og:description" content="Notes on protocol internals, infrastructure decisions and verification." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/blog/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="work-head">
+    <div></div>
+    <div>
+      <span class="pill">Notes &amp; essays</span>
+      <h1 class="work-title" data-scramble>BLOG</h1>
+      <p class="detail-sum" style="margin-top:20px">
+        Written when something turned out differently than expected — protocol
+        internals, infrastructure decisions, and the occasional claim that did
+        not survive checking.
+      </p>
+    </div>
+  </div>
+
+  <div class="posts">
+      <a class="post rv" href="half-the-portfolio-advice-did-not-survive-checking/">
+        <div class="post-meta">
+          <span class="post-date">20 Sep 2026</span>
+          <span class="post-tag">Method</span>
+          <span class="post-time">2 min</span>
+        </div>
+        <h2 class="post-title">Half the portfolio advice I checked did not survive verification</h2>
+        <p class="post-ex">I ran twenty-five claims about engineer portfolios through adversarial verification. Eleven died — and almost all of them were the statistics people quote most confidently.</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+      <a class="post rv" href="nobody-can-tell-you-who-viewed-your-github/">
+        <div class="post-meta">
+          <span class="post-date">20 Sep 2026</span>
+          <span class="post-tag">Note</span>
+          <span class="post-time">2 min</span>
+        </div>
+        <h2 class="post-title">Nobody can tell you who viewed your GitHub profile</h2>
+        <p class="post-ex">There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable.</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+      <a class="post rv" href="multisig-protects-against-a-stolen-key/">
+        <div class="post-meta">
+          <span class="post-date">17 Sep 2026</span>
+          <span class="post-tag">Security</span>
+          <span class="post-time">2 min</span>
+        </div>
+        <h2 class="post-title">A multisig protects against a stolen key, not against every signer being shown the same lie</h2>
+        <p class="post-ex">Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times.</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+      <a class="post rv" href="the-gateway-not-the-node/">
+        <div class="post-meta">
+          <span class="post-date">08 Sep 2026</span>
+          <span class="post-tag">Infrastructure</span>
+          <span class="post-time">2 min</span>
+        </div>
+        <h2 class="post-title">The gateway, not the node, is what makes self-hosting trustworthy</h2>
+        <p class="post-ex">Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too.</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+      <a class="post rv" href="subgraph-read-side-indexer-money-path/">
+        <div class="post-meta">
+          <span class="post-date">08 Sep 2026</span>
+          <span class="post-tag">Architecture</span>
+          <span class="post-time">2 min</span>
+        </div>
+        <h2 class="post-title">Subgraph for the read side, custom indexer for the money path</h2>
+        <p class="post-ex">A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg.</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+  </div>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← Back home</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../#about">ABOUT</a>
+    <a href="../work/">WORK</a>
+    <a href="./">BLOG</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
