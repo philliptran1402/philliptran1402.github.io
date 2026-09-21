@@ -33,13 +33,47 @@ ASSET_V = hashlib.md5(
     (ROOT / "assets" / "site.css").read_bytes()
     + (ROOT / "assets" / "site.js").read_bytes()
 ).hexdigest()[:8]
+SITE = "https://philliptran1402.github.io/"
+
+PERSON = {
+    "@type": "Person",
+    "@id": SITE + "#phitran",
+    "name": "Phi Tran",
+    "alternateName": "Phillip Tran",
+    "jobTitle": "Backend & DeFi Infrastructure Engineer",
+    "description": ("Software engineer with 6+ years building backend systems on the money path: "
+                    "perpetual DEX, lending, options and RWA platforms, reorg-safe indexers, "
+                    "automated signing behind a policy engine, and AI agents with deterministic guardrails."),
+    "url": SITE,
+    "image": "https://github.com/philliptran1402.png",
+    "email": "mailto:phitranviet99@gmail.com",
+    "address": {"@type": "PostalAddress", "addressLocality": "Da Nang", "addressCountry": "VN"},
+    "knowsLanguage": [{"@type": "Language", "name": "Vietnamese"}, {"@type": "Language", "name": "English"}],
+    "knowsAbout": [
+        "Backend engineering", "Distributed systems", "Perpetual DEX", "Decentralized finance",
+        "Lending protocols", "Options and derivatives", "Real-world asset tokenization",
+        "Blockchain indexing", "Reorg handling", "EVM", "Smart contracts", "Oracles",
+        "Key custody and transaction signing", "LLM agents", "TypeScript", "Go", "Rust",
+        "Solidity", "PostgreSQL", "Apache Kafka", "Redis", "Docker", "Kubernetes",
+    ],
+    "sameAs": ["https://github.com/philliptran1402", "https://linkedin.com/in/phitrantech"],
+}
+
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 CATS = [("case", "Case study"), ("research", "Protocol research"), ("lab", "Runnable lab")]
 
 
-def head(title, desc, css_depth, canonical):
-    """Shared <head>. css_depth is how many ../ to reach the site root."""
+def head(title, desc, css_depth, canonical, jsonld=None):
+    """Shared <head>. css_depth is how many ../ to reach the site root.
+       jsonld: a dict or list emitted as schema.org structured data. It must
+       describe only what is visibly on the page — structured data that does
+       not match the rendered content is a spam-policy violation."""
     up = "../" * css_depth
+    ld = ""
+    if jsonld:
+        ld = ('<script type="application/ld+json">'
+              + json.dumps(jsonld, ensure_ascii=False, separators=(",", ":"))
+              + "</script>\n")
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,6 +81,7 @@ def head(title, desc, css_depth, canonical):
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{html.escape(title)}</title>
 <meta name="description" content="{html.escape(desc)}" />
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://philliptran1402.github.io/{canonical}" />
 <meta property="og:title" content="{html.escape(title)}" />
@@ -62,6 +97,7 @@ def head(title, desc, css_depth, canonical):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="{up}assets/site.css?v={ASSET_V}" />
+{ld}
 </head>
 <body>
 
@@ -186,10 +222,16 @@ def build_index(projects):
   </div>
 </footer>
 """
+    ld = {"@context": "https://schema.org", "@type": "CollectionPage",
+          "name": "Work — Phi Tran", "url": SITE + "work/",
+          "about": {"@id": SITE + "#phitran"},
+          "hasPart": [{"@type": "CreativeWork", "name": p["title"],
+                       "url": SITE + "work/" + p["slug"] + "/",
+                       "abstract": p["summary"]} for p in projects]}
     page = (
         head("Work — Phi Tran",
              "Selected engineering work: money-path case studies, protocol research notes and runnable infrastructure labs.",
-             1, "work/")
+             1, "work/", ld)
         + body
         + tail(1, "../#about", "./")
     )
@@ -270,8 +312,22 @@ def build_detail(p, prev_p, next_p, by_slug):
   </div>
 </footer>
 """
+    ld = [
+        {"@context": "https://schema.org", "@type": "TechArticle",
+         "headline": p["title"], "abstract": p["summary"],
+         "url": SITE + "work/" + p["slug"] + "/",
+         "mainEntityOfPage": SITE + "work/" + p["slug"] + "/",
+         "author": {"@id": SITE + "#phitran"}, "publisher": {"@id": SITE + "#phitran"},
+         "inLanguage": "en", "about": p["kind"],
+         "isPartOf": {"@type": "CollectionPage", "url": SITE + "work/"}},
+        {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE},
+            {"@type": "ListItem", "position": 2, "name": "Work", "item": SITE + "work/"},
+            {"@type": "ListItem", "position": 3, "name": p["title"]}]},
+        PERSON,
+    ]
     page = (
-        head(f"{p['title']} — Phi Tran", p["summary"], 2, f"work/{p['slug']}/")
+        head(f"{p['title']} — Phi Tran", p["summary"], 2, f"work/{p['slug']}/", ld)
         + body
         + tail(2, "../../#about", "../")
     )
@@ -342,9 +398,15 @@ def build_blog_index(posts):
   </div>
 </footer>
 """
+    ld = {"@context": "https://schema.org", "@type": "Blog",
+          "name": "Blog — Phi Tran", "url": SITE + "blog/",
+          "author": {"@id": SITE + "#phitran"},
+          "blogPost": [{"@type": "BlogPosting", "headline": x["title"],
+                        "url": SITE + "blog/" + x["slug"] + "/",
+                        "datePublished": x["date"], "abstract": x["excerpt"]} for x in posts]}
     page = (head("Blog — Phi Tran",
                  "Notes on protocol internals, infrastructure decisions and verification.",
-                 1, "blog/")
+                 1, "blog/", ld)
             + body + tail(1, "../#about", "../work/", "./"))
     BLOG.mkdir(exist_ok=True)
     (BLOG / "index.html").write_text(page, encoding="utf-8")
@@ -397,11 +459,66 @@ def build_post(p, prev_p, next_p):
   </div>
 </footer>
 """
-    page = (head(f"{p['title']} — Phi Tran", p["excerpt"], 2, f"blog/{p['slug']}/")
+    ld = [
+        {"@context": "https://schema.org", "@type": "BlogPosting",
+         "headline": p["title"], "abstract": p["excerpt"], "description": p["excerpt"],
+         "url": SITE + "blog/" + p["slug"] + "/",
+         "mainEntityOfPage": SITE + "blog/" + p["slug"] + "/",
+         "datePublished": p["date"], "dateModified": p["date"],
+         "keywords": p["tag"], "inLanguage": "en",
+         "wordCount": sum(len(re.sub(r"<[^>]+>", " ", b).split()) for _, b in p["body"]),
+         "author": {"@id": SITE + "#phitran"}, "publisher": {"@id": SITE + "#phitran"},
+         "isPartOf": {"@type": "Blog", "url": SITE + "blog/"}},
+        {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "blog/"},
+            {"@type": "ListItem", "position": 3, "name": p["title"]}]},
+        PERSON,
+    ]
+    page = (head(f"{p['title']} — Phi Tran", p["excerpt"], 2, f"blog/{p['slug']}/", ld)
             + body + tail(2, "../../#about", "../../work/", "../"))
     out = BLOG / p["slug"]
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_text(page, encoding="utf-8")
+
+
+def build_sitemap(projects, posts):
+    urls = [(SITE, "1.0"), (SITE + "work/", "0.8"), (SITE + "blog/", "0.8")]
+    urls += [(SITE + "work/" + p["slug"] + "/", "0.6") for p in projects]
+    urls += [(SITE + "blog/" + p["slug"] + "/", "0.6") for p in posts]
+    body = "".join(
+        f"  <url><loc>{u}</loc><priority>{pr}</priority></url>\n" for u, pr in urls)
+    (ROOT / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">\n'.replace("sitemap.org", "sitemaps.org")
+        + body + "</urlset>\n", encoding="utf-8")
+    return len(urls)
+
+
+def build_feed(posts):
+    """RSS 2.0 — the standard way a blog gets syndicated and discovered."""
+    items = ""
+    for p in posts:
+        link = SITE + "blog/" + p["slug"] + "/"
+        y, m, d = p["date"].split("-")
+        pub = f"{MONTHS[int(m)-1]} {d} {y}"
+        items += (f"    <item>\n      <title>{html.escape(p['title'])}</title>\n"
+                  f"      <link>{link}</link>\n      <guid isPermaLink=\"true\">{link}</guid>\n"
+                  f"      <pubDate>{pub}</pubDate>\n"
+                  f"      <description>{html.escape(p['excerpt'])}</description>\n    </item>\n")
+    (ROOT / "feed.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0">\n  <channel>\n'
+        "    <title>Phi Tran — Blog</title>\n"
+        f"    <link>{SITE}blog/</link>\n"
+        "    <description>Notes on protocol internals, infrastructure decisions and verification.</description>\n"
+        "    <language>en</language>\n" + items + "  </channel>\n</rss>\n", encoding="utf-8")
+    return len(posts)
+
+
+def build_robots():
+    (ROOT / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n\n"
+        f"Sitemap: {SITE}sitemap.xml\n", encoding="utf-8")
 
 
 def main():
@@ -433,10 +550,17 @@ def main():
         build_post(p, posts[i - 1] if i else None,
                    posts[i + 1] if i + 1 < len(posts) else None)
 
+    n_urls = build_sitemap(projects, posts)
+    n_feed = build_feed(posts)
+    build_robots()
+
     print(f"work/index.html  — {total} projects {counts}")
     print(f"work/<slug>/     — {len(projects)} detail pages")
     print(f"blog/index.html  — {len(posts)} posts")
     print(f"blog/<slug>/     — {len(posts)} post pages")
+    print(f"sitemap.xml      — {n_urls} URLs")
+    print(f"feed.xml         — {n_feed} items")
+    print("robots.txt       — allow all + sitemap")
 
 
 if __name__ == "__main__":

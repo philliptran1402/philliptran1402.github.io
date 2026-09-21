@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Phi Tran — Blog</title>
+    <link>https://philliptran1402.github.io/blog/</link>
+    <description>Notes on protocol internals, infrastructure decisions and verification.</description>
+    <language>en</language>
+    <item>
+      <title>Half the portfolio advice I checked did not survive verification</title>
+      <link>https://philliptran1402.github.io/blog/half-the-portfolio-advice-did-not-survive-checking/</link>
+      <guid isPermaLink="true">https://philliptran1402.github.io/blog/half-the-portfolio-advice-did-not-survive-checking/</guid>
+      <pubDate>Sep 20 2026</pubDate>
+      <description>I ran twenty-five claims about engineer portfolios through adversarial verification. Eleven died — and almost all of them were the statistics people quote most confidently.</description>
+    </item>
+    <item>
+      <title>Nobody can tell you who viewed your GitHub profile</title>
+      <link>https://philliptran1402.github.io/blog/nobody-can-tell-you-who-viewed-your-github/</link>
+      <guid isPermaLink="true">https://philliptran1402.github.io/blog/nobody-can-tell-you-who-viewed-your-github/</guid>
+      <pubDate>Sep 20 2026</pubDate>
+      <description>There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable.</description>
+    </item>
+    <item>
+      <title>A multisig protects against a stolen key, not against every signer being shown the same lie</title>
+      <link>https://philliptran1402.github.io/blog/multisig-protects-against-a-stolen-key/</link>
+      <guid isPermaLink="true">https://philliptran1402.github.io/blog/multisig-protects-against-a-stolen-key/</guid>
+      <pubDate>Sep 17 2026</pubDate>
+      <description>Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times.</description>
+    </item>
+    <item>
+      <title>The gateway, not the node, is what makes self-hosting trustworthy</title>
+      <link>https://philliptran1402.github.io/blog/the-gateway-not-the-node/</link>
+      <guid isPermaLink="true">https://philliptran1402.github.io/blog/the-gateway-not-the-node/</guid>
+      <pubDate>Sep 08 2026</pubDate>
+      <description>Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too.</description>
+    </item>
+    <item>
+      <title>Subgraph for the read side, custom indexer for the money path</title>
+      <link>https://philliptran1402.github.io/blog/subgraph-read-side-indexer-money-path/</link>
+      <guid isPermaLink="true">https://philliptran1402.github.io/blog/subgraph-read-side-indexer-money-path/</guid>
+      <pubDate>Sep 08 2026</pubDate>
+      <description>A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg.</description>
+    </item>
+  </channel>
+</rss>

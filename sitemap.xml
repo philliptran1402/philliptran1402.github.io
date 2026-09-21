@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://philliptran1402.github.io/</loc><priority>1.0</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/</loc><priority>0.8</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/</loc><priority>0.8</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/reorg-safe-indexer/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/signing-policy-engine/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/rpc-gateway/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/agent-guardrails/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/perp-dex-architectures/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/oracles-push-vs-pull/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/lending-internals/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/cross-chain-messaging/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/smart-contract-multisig/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/inside-graph-node/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/rpc-gateway-lab/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/subgraph-lab/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/concurrency-labs/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/work/exploit-fix-labs/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/half-the-portfolio-advice-did-not-survive-checking/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/nobody-can-tell-you-who-viewed-your-github/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/multisig-protects-against-a-stolen-key/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/the-gateway-not-the-node/</loc><priority>0.6</priority></url>
+  <url><loc>https://philliptran1402.github.io/blog/subgraph-read-side-indexer-money-path/</loc><priority>0.6</priority></url>
+</urlset>
