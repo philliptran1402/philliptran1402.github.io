@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cross-chain messaging internals — Phi Tran</title>
+<meta name="description" content="LayerZero&#x27;s split between who verifies a message and who delivers it." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/cross-chain-messaging/" />
+<meta property="og:title" content="Cross-chain messaging internals — Phi Tran" />
+<meta property="og:description" content="LayerZero&#x27;s split between who verifies a message and who delivers it." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/cross-chain-messaging/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Research</p>
+    <span class="pill">Protocol internals</span>
+    <h1 class="detail-title">Cross-chain messaging internals</h1>
+    <p class="detail-sum">LayerZero&#x27;s split between who verifies a message and who delivers it.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  OApp ──▶ Endpoint
+             │
+        DVN verify (M-of-N)
+             │
+        Executor deliver
+   verify ≠ execute</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Covers</dt><dd>LayerZero V2 — Endpoint, DVN, Executor</dd>
+      <dt>Angle</dt><dd>Where the trust actually sits</dd>
+      <dt>Question</dt><dd>Who is allowed to assert what happened elsewhere?</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The first-principles problem</p>
+    <div class="prose"><p>Two chains cannot read each other's state. Any cross-chain message therefore reduces to one question: <b>who is allowed to assert that something happened on chain A, and under what conditions does chain B believe them?</b> Every bridge design is an answer to that, and most bridge failures are the answer being weaker than advertised.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — The architecture</p>
+    <div class="prose"><p>An application contract talks to an Endpoint on each chain. Verification is performed by <b>DVNs</b> — decentralized verifier networks — in an M-of-N configuration the application itself chooses. Delivery is performed separately by an <b>Executor</b>.</p><p>Splitting verification from execution is the design's core insight. A message can be verified but undelivered — the Executor being unavailable is an inconvenience, not a loss of safety — and delivery can be retried without repeating verification.</p><p>Per-pathway configuration sets how many source-chain confirmations are required before a message is considered verifiable, which is the cross-chain equivalent of a finality tier.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Where it can still go wrong</p>
+    <div class="prose"><p>The application chooses its DVN set, so the security of a given pathway is the security of that choice — a cheap single-verifier configuration is a single point of trust wearing decentralized clothing. This is configuration, not protocol, and it is the first thing to inspect when evaluating an integration.</p><p>Replay protection comes from nonces and a per-message identifier; ordering guarantees are per-pathway, not global. <b>Any token transfer built on top must have a conservation invariant that can be reconciled independently</b>, because "the message said so" is not an accounting record.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../lending-internals/">← Lending protocol internals</a>
+    <a href="../">All work</a>
+    <a href="../smart-contract-multisig/">How a smart-contract multisig works →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

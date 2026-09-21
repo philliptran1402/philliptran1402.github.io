@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Three perpetual DEX architectures, compared — Phi Tran</title>
+<meta name="description" content="One constraint, three architectures — and different things to trust." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/perp-dex-architectures/" />
+<meta property="og:title" content="Three perpetual DEX architectures, compared — Phi Tran" />
+<meta property="og:description" content="One constraint, three architectures — and different things to trust." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/perp-dex-architectures/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Research</p>
+    <span class="pill">Protocol internals</span>
+    <h1 class="detail-title">Three perpetual DEX architectures, compared</h1>
+    <p class="detail-sum">One constraint, three architectures — and different things to trust.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  GMX        pool is counterparty
+  Hyperliquid  own L1, on-chain CLOB
+  Nado       off-chain match,
+             on-chain risk engine</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Read at</dt><dd>Protocol docs and contracts, not summaries</dd>
+      <dt>Covers</dt><dd>GMX · Hyperliquid · Nado</dd>
+      <dt>Question</dt><dd>Who is the counterparty, and who do you trust?</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — Why compare these three</p>
+    <div class="prose"><p>All three solve the same constraint — a real order book needs millisecond latency, and block times do not provide it — and each answers differently. Put side by side, the comparison exposes what a perp DEX actually has to decide.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — GMX — the pool is the counterparty</p>
+    <div class="prose"><p>There is no matching. Traders open positions against a shared liquidity pool (GLP in v1, GM pools in v2), and liquidity providers take the other side of every trade's profit and loss. Price comes from an oracle rather than from an order book, which is why v1 advertised zero price impact.</p><p>Orders are requests executed by keepers a short time later, so the fill price is the price at execution, not at submission. What you trust: the oracle, and the pool parameters.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Hyperliquid — build the chain to fit the book</p>
+    <div class="prose"><p>Rather than accept block-time constraints, Hyperliquid runs its own L1 where matching happens inside consensus. A fully on-chain central-limit order book, with validators doing the matching a centralized exchange would do on an internal server.</p><p>Integration looks more like a CEX than a contract call — REST and WebSocket, orders signed with EIP-712. What you trust: the validator set of a young chain.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">04 — Nado — split matching from risk</p>
+    <div class="prose"><p>Matching runs off-chain in a sequencer at single-digit milliseconds; the clearinghouse and risk engine stay on-chain, on Ink (an OP Stack L2). The sequencer can order and match but holds no custody and cannot forge signatures — withdrawals and liquidations all require on-chain verification.</p><p>What you trust: the sequencer for ordering and liveness, plus the L2 beneath it. The MEV argument is economic rather than cryptographic — millisecond latency and batching make extraction unprofitable, which is a claim worth checking rather than accepting.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">05 — What the comparison teaches</p>
+    <div class="prose"><p>The question is never "which is best". It is <b>what are you willing to trust, and what does that buy</b>: a pool's parameters and oracle, a new validator set, or a sequencer's ordering. Every perp design pays for speed somewhere, and the three pay in different currencies.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../agent-guardrails/">← AI agent with deterministic guardrails</a>
+    <a href="../">All work</a>
+    <a href="../oracles-push-vs-pull/">Oracles: push versus pull →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

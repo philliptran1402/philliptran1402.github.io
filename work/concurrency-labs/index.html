@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Concurrency labs — Phi Tran</title>
+<meta name="description" content="Data races, goroutine leaks and deadlocks made reproducible on demand." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/concurrency-labs/" />
+<meta property="og:title" content="Concurrency labs — Phi Tran" />
+<meta property="og:description" content="Data races, goroutine leaks and deadlocks made reproducible on demand." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/concurrency-labs/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Lab</p>
+    <span class="pill">Runnable · Go &amp; Rust</span>
+    <h1 class="detail-title">Concurrency labs</h1>
+    <p class="detail-sum">Data races, goroutine leaks and deadlocks made reproducible on demand.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  $ go test -race -run Race
+  WARNING: DATA RACE
+  final = 33719 ≠ 100000
+  ─────────────────────
+  the bug, reproduced
+  deterministically</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Run</dt><dd>go test -race · cargo test</dd>
+      <dt>Stack</dt><dd>Go and Rust standard libraries — no dependencies</dd>
+      <dt>Proves</dt><dd>Two languages, two safety philosophies</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — What it is</p>
+    <div class="prose"><p>Concurrency bugs are the class that is hard to reproduce and easy to lose money on. These labs reproduce them on demand instead of waiting for production to do it.</p><p>The Go side covers data races caught by the race detector, goroutine leaks measured against a baseline goroutine count, and four shapes of deadlock — including one in a separate binary that genuinely crashes with <i>all goroutines are asleep</i>.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — The comparison that makes it worth doing</p>
+    <div class="prose"><p>The Rust labs implement the same data race, and the point is where it is caught. Go finds it at <b>runtime</b>, with the race detector, and only if a test happens to exercise the bad interleaving. Rust refuses to <b>compile</b> it.</p><p>The Rust tests assert that refusal explicitly — <code>compile_fail</code> doctests proving the borrow checker rejects use-after-move, two mutable borrows, and sending a non-<code>Send</code> type across threads. A test that asserts code does not compile is an unusual and very direct way to document a language guarantee.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Why it matters for money systems</p>
+    <div class="prose"><p>A race on a balance update is not a flaky test, it is an incorrect ledger. Having a deterministic reproduction of each failure shape — and knowing which language catches which class, and when — changes how you review concurrent code rather than just how you debug it.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../subgraph-lab/">← Self-hosted subgraph stack</a>
+    <a href="../">All work</a>
+    <a href="../exploit-fix-labs/">Exploit → fix labs →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

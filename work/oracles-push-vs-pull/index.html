@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Oracles: push versus pull — Phi Tran</title>
+<meta name="description" content="Why the update model changes your liquidation design." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/oracles-push-vs-pull/" />
+<meta property="og:title" content="Oracles: push versus pull — Phi Tran" />
+<meta property="og:description" content="Why the update model changes your liquidation design." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/oracles-push-vs-pull/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Research</p>
+    <span class="pill">Protocol internals</span>
+    <h1 class="detail-title">Oracles: push versus pull</h1>
+    <p class="detail-sum">Why the update model changes your liquidation design.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  push (Chainlink)
+    DON ──▶ writes on-chain
+  pull (Pyth)
+    Hermes ──▶ you submit
+    + confidence interval</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Covers</dt><dd>Chainlink · Pyth</dd>
+      <dt>Angle</dt><dd>How the update model reshapes the consumer</dd>
+      <dt>Watch for</dt><dd>Staleness, and ignoring confidence</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — Two different shapes</p>
+    <div class="prose"><p>Chainlink <b>pushes</b>: a decentralized oracle network aggregates off-chain, and nodes write the price on-chain when it deviates past a threshold or a heartbeat elapses. Reading is free and the value is simply there — possibly slightly old.</p><p>Pyth <b>pulls</b>: first-party publishers submit prices to an appchain at sub-second frequency, but nothing reaches your chain until a consumer fetches a signed update from Hermes and submits it, paying the gas, typically in the same transaction as the action that uses it.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Why it changes your architecture</p>
+    <div class="prose"><p>With push, the natural design is a poller and a cache: read the feed, store it, let the engine consume it. With pull there is nothing to poll — the update fetch belongs inline with the transaction, as close to execution as possible. The same liquidation bot is structured differently depending on which you use.</p><p>Pyth also returns a <b>confidence interval</b> alongside the price. Used properly, a widening interval is a signal to be more conservative — exactly when publishers disagree, which is exactly when markets are violent. Ignoring it throws away the most useful field in the response.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — The failure modes to design around</p>
+    <div class="prose"><p>Staleness is the shared risk and it is silent: an old price is still a number. Chainlink consumers must check the round timestamp themselves; Pyth ships a built-in guard via a max-age parameter that reverts instead of returning something stale.</p><p>Both have a trust layer worth naming: a decentralized node network for one, and for the other an attestation path that is not operated by the oracle project itself. <b>An oracle is a ceiling on how safe a lending or perp protocol can be</b> — no downstream design compensates for a price that is wrong.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../perp-dex-architectures/">← Three perpetual DEX architectures, compared</a>
+    <a href="../">All work</a>
+    <a href="../lending-internals/">Lending protocol internals →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

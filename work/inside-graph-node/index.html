@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>What graph-node does when you deploy a subgraph — Phi Tran</title>
+<meta name="description" content="Where a subgraph stops being right and a custom indexer starts." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/inside-graph-node/" />
+<meta property="og:title" content="What graph-node does when you deploy a subgraph — Phi Tran" />
+<meta property="og:description" content="Where a subgraph stops being right and a custom indexer starts." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/inside-graph-node/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Research</p>
+    <span class="pill">Protocol internals</span>
+    <h1 class="detail-title">What graph-node does when you deploy a subgraph</h1>
+    <p class="detail-sum">Where a subgraph stops being right and a custom indexer starts.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  entity rows keyed by
+  [block_from, block_to)
+  reorg ──▶ drop versions
+  POI = hash of all writes
+  grafting skips re-index</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Covers</dt><dd>graph-node internals · The Graph network</dd>
+      <dt>Angle</dt><dd>Operating it, not just deploying to it</dd>
+      <dt>Question</dt><dd>Read side or money path?</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The contract you sign</p>
+    <div class="prose"><p>Three files define everything: a manifest saying what to watch and from which block, a schema defining entities as tables, and mappings compiled to WASM that turn events into entities. graph-node is the runtime — it ingests blocks, runs handlers, stores entities and serves GraphQL — and it guarantees that the same manifest produces the same data everywhere. That guarantee is why mappings must be deterministic: no clock, no randomness, no HTTP.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — How reorgs are free</p>
+    <div class="prose"><p>Every <code>save()</code> writes a <i>version</i> row carrying the block range it is valid for. Time-travel queries fall out of that design, and so does reorg handling: reverting means dropping versions whose range opens after the fork point. The ingestor keeps recent ancestors and detects forks by parent hash, with a configurable maximum depth it will tolerate.</p><p>You write no reorg code — but your dashboards still see numbers move backwards for a few seconds, so the application layer cannot pretend it did not happen.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Operating it</p>
+    <div class="prose"><p>The indexing-status endpoint is the real monitoring surface: synced, health, fatal error, and the gap between chain head and latest indexed block. Alert on that gap. A handler that throws stops the subgraph at that block until a fix is deployed, and a schema change means re-indexing from scratch — which is why <b>grafting</b> exists, letting a new version continue from an existing one, and why <b>pruning</b> exists to stop version history from filling the database.</p><p>graph-node also needs a good RPC underneath it, which is where this connects back to the gateway work.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">04 — The decision it forces</p>
+    <div class="prose"><p>A subgraph gives you reorg handling and time travel for free, in exchange for fixed GraphQL, no aggregation, no joins against off-chain data and no non-deterministic logic. That makes it excellent for a read side and wrong for a ledger.</p><p>The rule I settled on: <b>subgraph for the read side, custom indexer for the money path</b> — both reading the same chain, neither acting as the other's source of truth.</p></div>
+  </section>
+
+    <p class="note" style="margin-top:34px">Related — <a href="../subgraph-lab/" style="color:var(--acc)">Self-hosted subgraph stack ↗</a></p>
+
+  <nav class="pager">
+    <a href="../smart-contract-multisig/">← How a smart-contract multisig works</a>
+    <a href="../">All work</a>
+    <a href="../rpc-gateway-lab/">RPC gateway lab →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

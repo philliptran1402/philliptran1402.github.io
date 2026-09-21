@@ -1,0 +1,71 @@
+[
+  {
+    "slug": "half-the-portfolio-advice-did-not-survive-checking",
+    "title": "Half the portfolio advice I checked did not survive verification",
+    "date": "2026-09-20",
+    "tag": "Method",
+    "excerpt": "I ran twenty-five claims about engineer portfolios through adversarial verification. Eleven died — and almost all of them were the statistics people quote most confidently.",
+    "body": [
+      ["", "<p>Before rebuilding this site I did something slightly unusual: instead of reading portfolio advice and acting on it, I collected the claims and tried to kill them.</p><p>Twenty-six sources were fetched and about a hundred and twenty-five falsifiable claims extracted. Twenty-five of those got the full treatment — three independent passes each, every pass instructed to <i>refute</i> rather than confirm, with a claim surviving only if at most one pass could knock it down.</p><p><b>Eleven of the twenty-five were refuted.</b> That ratio is the interesting part, but what died is more interesting still.</p>"],
+      ["The casualties were all numbers", "<p>Every statistic about recruiter behaviour failed:</p><p>• \"Recruiters spend a median of 31 seconds per resume.\"<br />• \"Reviewers spend a median of 1 minute 40 seconds.\"<br />• \"Engineers score resumes containing projects measurably higher.\"</p><p>Three votes to zero against, each one. These are the numbers that appear in nearly every \"how to build a developer portfolio\" article, usually without a link, often attributed to a study that says something adjacent but not that.</p><p>Round numbers about attention spans travel well because they are quotable and nobody checks them. That is exactly why they should be checked.</p>"],
+      ["What did survive", "<p>Two findings held up, and both are uncomfortable.</p><p><b>Recruiters screening engineers predict interview outcomes at roughly chance level.</b> That is from a study of 76 technical recruiters producing around 2,200 evaluations measured against real interview results.</p><p><b>Pedigree moves the needle, demonstrated work moves it less.</b> FAANG or FAANG-adjacent experience made a candidate about 35% more likely to be advanced.</p><p>Put together, those two say something deflating about the screening stage: it is noisy, and the signal it responds to most strongly is one you cannot build over a weekend.</p>"],
+      ["What I did with that", "<p>I stopped treating the portfolio as a conversion-rate problem. If screening is close to random and weights pedigree, then polishing the site is not where the leverage is.</p><p>So the site got shorter, not longer. Four case studies instead of a project grid, each stating what the decision cost. Nothing that claims a number I cannot defend.</p><p>The honest summary: a portfolio is unlikely to get you past a screen you would otherwise fail. It is very likely to matter in the conversation <i>after</i> someone is already interested — and that is a different artifact than the one most advice tells you to build.</p>"],
+      ["The part worth stealing", "<p>The method transfers. When a claim carries a number and the number is doing the persuading, try to refute it before you act on it. Roughly half of what I checked did not survive, and none of the casualties looked suspicious beforehand.</p>"]
+    ]
+  },
+  {
+    "slug": "nobody-can-tell-you-who-viewed-your-github",
+    "title": "Nobody can tell you who viewed your GitHub profile",
+    "date": "2026-09-20",
+    "tag": "Note",
+    "excerpt": "There is no LinkedIn-style visitor list, the view counter badge cannot identify anyone, and the tracking-pixel trick does not work. Here is what is actually measurable.",
+    "body": [
+      ["", "<p>I went looking for a way to see who had been visiting my GitHub profile. The short answer is that it does not exist, and the reason it does not exist is more interesting than the question.</p>"],
+      ["Why the counter badge cannot know", "<p>Those <code>Profile views: N</code> badges are third-party image endpoints that increment on each request. They produce a count, never an identity — and the count is approximate.</p><p>The mechanism is the reason: GitHub proxies every image in rendered Markdown through its own camo service. The server behind the badge sees a request from GitHub's proxy, not from the person reading the page. No visitor IP, no user agent, nothing to identify.</p><p>That same proxy is why the classic tracking-pixel trick does not work here. It is not a gap waiting to be exploited; it is the point of the design.</p>"],
+      ["What is actually measurable", "<p><b>Followers, stargazers, watchers, forkers.</b> Real names, and a much stronger signal than a view — someone took an action.</p><p><b>Repository traffic insights.</b> Under Insights → Traffic, for repositories you can push to: views, unique visitors, and referring sites, for the last fourteen days. Counts only, no identities.</p><p>The referrer column is the useful one. Knowing that traffic came from LinkedIn rather than from a search is more actionable than knowing one stranger's username.</p><p><b>LinkedIn</b> is the only platform in this stack that genuinely answers \"who looked at me\", which is worth remembering when deciding where to spend effort.</p>"],
+      ["The result that actually mattered", "<p>I pulled my own numbers expecting to tune something. Views across my repositories over fourteen days: zero. Followers: five, of which four were my own alternate accounts.</p><p>No amount of analytics fixes that, because there was nothing to analyse. The problem was not measurement, it was that the work worth looking at was sitting in a private repository.</p><p>Which is the actual lesson: instrumentation is useful once there is traffic. Before that, it is a way to feel productive while avoiding the harder task of publishing something.</p>"]
+    ]
+  },
+  {
+    "slug": "the-gateway-not-the-node",
+    "title": "The gateway, not the node, is what makes self-hosting trustworthy",
+    "date": "2026-09-08",
+    "tag": "Infrastructure",
+    "excerpt": "Running your own node fixes cost, privacy and latency. It does not fix the failure that actually hurts, because your node can lag too.",
+    "body": [
+      ["", "<p>The self-hosting conversation usually runs on cost. Compute units get expensive, <code>eth_getLogs</code> is priced like a luxury good, so you run your own node and the bill flattens out.</p><p>That reasoning is fine and it misses the failure that actually costs money.</p>"],
+      ["Five ways a provider URL hurts you", "<p>A single RPC endpoint can: <b>lie</b> by serving a head from forty minutes ago, <b>rate-limit</b> you in the middle of a volatile market, <b>reprice</b> as you scale, <b>observe</b> every address you care about, and <b>add latency</b> by living on another continent.</p><p>Self-hosting fixes four of those. It does not fix the first one — because your own node lags too, crashes too, and needs patching on fork day like everything else.</p>"],
+      ["A lying upstream returns 200", "<p>This is what makes staleness nastier than downtime. An endpoint that is down returns an error and your retry logic handles it. An endpoint that is behind returns a valid response with old data, and every consumer downstream acts on it confidently.</p><p>A node cannot detect its own lag either. <code>eth_syncing</code> returning false means the node believes it is caught up. A node isolated from its peers believes that too, at a head from an hour ago.</p><p><b>The only way to detect it is to compare against a second source.</b> That is an architectural property, not a configuration flag — which is why no amount of node tuning gets you there.</p>"],
+      ["What the gateway does", "<p>Every service talks to one internal URL. Behind it: probe each upstream's head on a short interval, mark anything too far behind the best as lagging and route around it, fail over on errors, cap <code>eth_getLogs</code> ranges before they reach a node, allowlist methods so <code>admin_</code> and <code>debug_</code> are unreachable, and rate-limit so one buggy loop cannot take the node down.</p><p>The design decision worth defending: <b>when only lagging sources remain, refuse to answer.</b> For anything that signs transactions, an error is recoverable and a stale answer is not.</p>"],
+      ["The shape of the answer", "<p>Self-host for cost, privacy and latency. Put a gateway in front for correctness. Keep a provider as a fallback upstream rather than as the primary.</p><p>Hybrid is not a compromise here — it is the only arrangement where you can tell that one of your sources is wrong.</p>"]
+    ]
+  },
+  {
+    "slug": "subgraph-read-side-indexer-money-path",
+    "title": "Subgraph for the read side, custom indexer for the money path",
+    "date": "2026-09-08",
+    "tag": "Architecture",
+    "excerpt": "A rule I arrived at after building both. The deciding factor is not query convenience — it is what happens to your balances during a reorg.",
+    "body": [
+      ["", "<p>Every team indexing chain data eventually asks whether to write a subgraph or build their own indexer. The usual framing is convenience against control, and that framing produces the wrong answer about half the time.</p>"],
+      ["What a subgraph gives you for free", "<p>Deploy a manifest, a schema and some mappings, and graph-node handles ingestion, storage and a GraphQL API. Two things it handles that people underestimate:</p><p><b>Reorgs.</b> Entities are stored as versions keyed by block range, so reverting a fork is deleting versions rather than repairing rows. You write no reorg code.</p><p><b>Time travel.</b> Querying state as of block N falls straight out of the same design.</p><p>Both are genuinely hard to build well, and getting them free is a real argument.</p>"],
+      ["What it takes away", "<p>Mappings must be deterministic: no clock, no randomness, no HTTP calls. GraphQL is fixed — no arbitrary aggregation, no joins against your off-chain tables. A schema change means re-indexing from scratch.</p><p>Each of those is survivable for a dashboard. None of them is survivable for a ledger.</p>"],
+      ["The deciding question", "<p>Not \"which is easier\" but <b>what happens to this data during a reorg</b>.</p><p>For a transaction history view: entities vanish and reappear over a few seconds, a chart twitches, nobody loses anything. Perfect fit.</p><p>For a balance that determines whether a withdrawal is allowed: the same revert silently changes the number your business logic just read. That is not a rendering artifact, it is a financial one — and it needs a confirmation policy tiered by value, an idempotent ledger and an audit trail, none of which a subgraph is built to express.</p>"],
+      ["The rule", "<p><b>Subgraph for the read side, custom indexer for the money path.</b> Both reading the same chain, neither acting as the other's source of truth.</p><p>In practice that also means the display balance and the spendable balance are allowed to disagree briefly — and the system has to be honest about which one it is showing.</p>"]
+    ]
+  },
+  {
+    "slug": "multisig-protects-against-a-stolen-key",
+    "title": "A multisig protects against a stolen key, not against every signer being shown the same lie",
+    "date": "2026-09-17",
+    "tag": "Security",
+    "excerpt": "Threshold signing assumes signers are approving different views of the same truth. When the interface is compromised, M-of-N approves the same forgery M times.",
+    "body": [
+      ["", "<p>Smart-contract multisigs are the default custody answer for treasuries, and they are a good one. They are also routinely described as protecting against a class of attack they do not touch.</p>"],
+      ["What the contract actually checks", "<p>Signatures are gathered off-chain and verified on-chain in one call. The contract confirms that enough valid signatures exist over a specific transaction hash. That is the whole guarantee, and it is a strong one: an attacker with one key cannot move anything.</p><p>Note what it does not check — whether the signers understood what they were signing.</p>"],
+      ["Two failure modes, same outcome", "<p><b>Concentration.</b> Ronin had enough valid signatures because too few parties controlled too many keys. The threshold was met exactly as designed; the independence it assumed was not there.</p><p><b>Deception.</b> The 2025 Bybit incident is sharper. No key was broken and every signature was valid. The signing interface showed signers a benign transaction while their devices signed a different hash. M-of-N worked perfectly and approved a forgery M times.</p><p>Threshold signing assumes each signer independently verifies. If they all verify through the same compromised surface, N signatures carry the information of one.</p>"],
+      ["The part people miss in the contract", "<p>Safe supports <b>Modules</b>: contracts authorised to execute through the Safe while bypassing the threshold check entirely. That is the feature — spending limits, recovery flows, session keys — and it is also a second authority path that a reviewer looking only at owners and threshold will not see.</p><p>Auditing a multisig means auditing its modules. \"It's 3-of-5\" describes one of the ways funds can move, not all of them.</p>"],
+      ["What actually closes the gap", "<p>Verify the transaction hash independently of the interface proposing it — a second device, a different client, anything not sharing a compromise with the first.</p><p>And for automated flows, put policy in a <b>Guard</b>, which runs before and after every transaction on the signing path and can revert even when signatures are valid. That is where limits and allowlists belong: in the contract, not in the frontend that might be lying to everyone at once.</p>"]
+    ]
+  }
+]

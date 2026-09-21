@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How a smart-contract multisig works — Phi Tran</title>
+<meta name="description" content="How Safe verifies M-of-N on-chain, and where Modules quietly bypass it." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/smart-contract-multisig/" />
+<meta property="og:title" content="How a smart-contract multisig works — Phi Tran" />
+<meta property="og:description" content="How Safe verifies M-of-N on-chain, and where Modules quietly bypass it." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/smart-contract-multisig/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Research</p>
+    <span class="pill">Protocol internals</span>
+    <h1 class="detail-title">How a smart-contract multisig works</h1>
+    <p class="detail-sum">How Safe verifies M-of-N on-chain, and where Modules quietly bypass it.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  SafeProxy ──delegatecall──▶
+      singleton (audited)
+  checkSignatures M-of-N
+  Modules bypass threshold
+  Guards run pre + post</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Covers</dt><dd>Safe — proxy, signatures, Modules, Guards</dd>
+      <dt>Angle</dt><dd>Where the authority actually lives</dd>
+      <dt>Question</dt><dd>What is the signer looking at when they approve?</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — Proxy and singleton</p>
+    <div class="prose"><p>Logic lives in one audited singleton deployed once per network. Each user's Safe is a minimal proxy that delegatecalls into it while keeping its own storage — owners, threshold, nonce, modules, guard. Creating a Safe is therefore cheap, and every Safe on a given version shares one well-reviewed implementation.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Verification happens on-chain</p>
+    <div class="prose"><p>Signatures are collected off-chain and checked on-chain in a single execute call. Three signature kinds are accepted: standard EIP-712 signatures, a pre-approved hash recorded by an owner, and a contract signature via EIP-1271 — which is how <b>a Safe can be an owner of another Safe</b>.</p><p>Off-chain coordination (the Transaction Service) stores pending transactions and collects approvals, but it is explicitly not the source of truth. Only the contract decides whether a transaction is authorised.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Modules and Guards — the parts that surprise people</p>
+    <div class="prose"><p>A <b>Module</b> is a contract authorised to execute through the Safe while bypassing the threshold check entirely. That is the feature — it is how spending limits, recurring payments, recovery flows and session keys are built — and it is also the part most people miss when they assume M-of-N covers every path. Auditing a Safe means auditing its modules.</p><p>A <b>Guard</b> runs before and after every transaction on the normal signing path and can revert even when signatures are valid, which is where automated policy belongs.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">04 — The failure mode that matters</p>
+    <div class="prose"><p>Ronin showed enough valid signatures controlled by too few parties. Bybit showed something sharper: no key broken, signatures valid, but the interface showed signers one transaction while their devices signed another hash. <b>A multisig protects against a stolen key, not against every signer being shown the same lie.</b> Verifying the hash independently of the interface proposing it is the control that closes that gap.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../cross-chain-messaging/">← Cross-chain messaging internals</a>
+    <a href="../">All work</a>
+    <a href="../inside-graph-node/">What graph-node does when you deploy a subgraph →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

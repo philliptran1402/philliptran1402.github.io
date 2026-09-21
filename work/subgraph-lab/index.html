@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Self-hosted subgraph stack — Phi Tran</title>
+<meta name="description" content="Full indexing stack end to end: contract, mapping, deploy, GraphQL query." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/subgraph-lab/" />
+<meta property="og:title" content="Self-hosted subgraph stack — Phi Tran" />
+<meta property="og:description" content="Full indexing stack end to end: contract, mapping, deploy, GraphQL query." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/subgraph-lab/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Lab</p>
+    <span class="pill">Runnable · Docker</span>
+    <h1 class="detail-title">Self-hosted subgraph stack</h1>
+    <p class="detail-sum">Full indexing stack end to end: contract, mapping, deploy, GraphQL query.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  docker compose up
+   ├ graph-node
+   ├ ipfs
+   ├ postgres
+   └ anvil
+  forge create → deploy
+  → graph deploy → query</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Run</dt><dd>docker compose up · 4 scripts</dd>
+      <dt>Stack</dt><dd>graph-node · IPFS · PostgreSQL · anvil · Foundry</dd>
+      <dt>Proves</dt><dd>The whole path, not a tutorial fragment</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — What it is</p>
+    <div class="prose"><p>The complete indexing stack on one machine: graph-node, IPFS, PostgreSQL and an anvil dev chain, plus a small ERC-20-style contract, a subgraph project and four scripts that take it from nothing to a working GraphQL query.</p><p>Deploy the contract, generate events, build the mapping to WASM, deploy the subgraph, query it. Every step runs; nothing is described and skipped.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Verified output</p>
+    <div class="prose"><p>After seeding one mint and two transfers, the query returns totals of three transfers, 1350 volume and 1000 minted, with balances of 650 and 350 across two accounts — and the indexing status reports synced with the latest block matching the chain head.</p><p>Those numbers are from an actual run, not an expectation written in advance.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Two things the docs do not warn you about</p>
+    <div class="prose"><p><b>graph-cli 0.97 requires an explicit <code>immutable</code> argument</b> on every <code>@entity</code> directive. Omit it and the build fails with a message that reads like a schema error rather than a version requirement.</p><p><b>graph-node spends about a minute on Postgres migrations on first start.</b> Deploy during that window and you get a connection reset that looks like a configuration problem but is just a race. The deploy script waits for the status port before proceeding, which is the fix.</p><p>Both cost real time to diagnose, which is exactly why a lab that actually runs is worth more than a tutorial that describes the same steps.</p></div>
+  </section>
+
+    <p class="note" style="margin-top:34px">Related — <a href="../inside-graph-node/" style="color:var(--acc)">What graph-node does when you deploy a subgraph ↗</a></p>
+
+  <nav class="pager">
+    <a href="../rpc-gateway-lab/">← RPC gateway lab</a>
+    <a href="../">All work</a>
+    <a href="../concurrency-labs/">Concurrency labs →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

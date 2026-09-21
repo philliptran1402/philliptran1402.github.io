@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reorg-safe event indexer — Phi Tran</title>
+<meta name="description" content="Hash-chain verification, rollback-able schema, confirmation tiers by value." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/reorg-safe-indexer/" />
+<meta property="og:title" content="Reorg-safe event indexer — Phi Tran" />
+<meta property="og:description" content="Hash-chain verification, rollback-able schema, confirmation tiers by value." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/reorg-safe-indexer/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Case study</p>
+    <span class="pill">On-chain data · Settlement</span>
+    <h1 class="detail-title">Reorg-safe event indexer</h1>
+    <p class="detail-sum">Hash-chain verification, rollback-able schema, confirmation tiers by value.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  block N-1 ──┬── hash ok
+  block N   ──┘
+      │  parent mismatch
+      ▼
+   revert range → re-index
+   ──────────────────────
+   tier: value → confirms</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Stack</dt><dd>Node.js · Kafka · PostgreSQL · Redis</dd>
+      <dt>Surface</dt><dd>EVM logs → derived state → query API</dd>
+      <dt>Hard part</dt><dd>Being wrong is worse than being late</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The problem</p>
+    <div class="prose"><p>Chain data is not final when you first see it. A block that exists now can be orphaned a few seconds later, and every row you derived from it becomes fiction. An indexer that treats a recent block as settled is a bug waiting for a reorg.</p><p>The failure is asymmetric. If a deposit is credited late, a user complains. If it is credited from a block that then disappears, the ledger is short and nobody finds out until reconciliation. <b>One direction is recoverable, the other costs money.</b></p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Approach</p>
+    <div class="prose"><p>Three decisions carry most of the weight.</p><p><b>Verify the chain, not the number.</b> Every ingested block carries its parent hash. Before applying it, the indexer checks that parent against the block it already has at that height. A mismatch means a fork, detected at ingestion instead of at reconciliation.</p><p><b>Make reverting a delete.</b> Entities are stored as versions keyed by the block range they were valid for, rather than as mutable rows. Undoing a fork becomes deleting every version whose range opens after the fork point — no compensating updates, no repair logic to get subtly wrong.</p><p><b>Tier confirmations by value.</b> A small transfer clears after a few confirmations. A large one waits for finality. The confirmation policy is a function of amount, not a single global constant, because the cost of being wrong is not uniform.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Trade-offs</p>
+    <div class="prose"><p>Large deposits settle noticeably slower, and that is a product decision as much as a technical one — it has to be explained to whoever owns the user experience.</p><p>The version-range schema is heavier than a flat table: more rows, more storage, and queries need a point-in-time predicate rather than a plain select. In exchange, time-travel queries come free and reorg handling stops being special-case code.</p><p><b>What I would not do again:</b> treating the reorg path as an edge case to handle later. It has to be in the schema from the first migration, because retrofitting rollback onto mutable rows means rewriting the data model under a live system.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <span></span>
+    <a href="../">All work</a>
+    <a href="../signing-policy-engine/">Automated signing behind a policy engine →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

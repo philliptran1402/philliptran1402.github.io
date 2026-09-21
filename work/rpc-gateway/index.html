@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RPC gateway with head-lag detection — Phi Tran</title>
+<meta name="description" content="Detect the lie, not the consequence. Refuse rather than serve stale." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/rpc-gateway/" />
+<meta property="og:title" content="RPC gateway with head-lag detection — Phi Tran" />
+<meta property="og:description" content="Detect the lie, not the consequence. Refuse rather than serve stale." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/rpc-gateway/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Case study</p>
+    <span class="pill">Infrastructure · Reliability</span>
+    <h1 class="detail-title">RPC gateway with head-lag detection</h1>
+    <p class="detail-sum">Detect the lie, not the consequence. Refuse rather than serve stale.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  app ──▶ gateway
+           ├─ probe head
+           ├─ lag &gt; N? skip
+           ├─ 5xx? failover
+           └─ getLogs cap
+          ▼ freshest node</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Stack</dt><dd>Go standard library · Docker · anvil</dd>
+      <dt>Surface</dt><dd>One internal URL for every service</dd>
+      <dt>Hard part</dt><dd>A lying upstream returns HTTP 200</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The problem</p>
+    <div class="prose"><p>A single RPC URL is an invisible trust boundary. Every service reads chain state through it, and it can be wrong in a way that looks exactly like being right.</p><p>A provider serving a head from forty minutes ago does not return an error. It returns <b>stale truth</b> with a 200, and every consumer downstream acts on it confidently. Meanwhile the bill grows in ways nobody predicted, because <code>eth_getLogs</code> is priced per compute unit and one careless backfill range can cost more than a month of node hosting.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Approach</p>
+    <div class="prose"><p>Every service talks to one internal gateway instead of a provider URL, and the gateway owns all the policy that would otherwise be copy-pasted into each client.</p><p>It probes each upstream's head on a short interval and marks any source more than N blocks behind the best as lagging — a source that is <i>up</i> but <i>behind</i> is treated as unavailable, because for reading money it is. It fails over on 5xx and timeouts, caps <code>eth_getLogs</code> block ranges before they reach a node, allowlists methods so <code>admin_</code> and <code>debug_</code> can never be reached from outside, and rate-limits with a token bucket so one buggy loop cannot take down the node.</p><p>The decision worth arguing about: <b>when only lagging sources remain, it refuses to answer.</b> For a bot that signs transactions, an error is recoverable and a stale answer is not.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Trade-offs</p>
+    <div class="prose"><p>An extra network hop on every call, and a new component that itself has to be operated, monitored and kept available — the gateway is now a dependency of everything.</p><p>Bought: the ability to detect the lie instead of discovering the consequence, plus a single place to change provider mix, limits and caching without touching service code.</p><p>There is a runnable version of this with deterministic tests — fake upstreams and an injected clock, so lag detection and failover are tested without waiting on real chain timing.</p></div>
+  </section>
+
+    <p class="note" style="margin-top:34px">Related — <a href="../rpc-gateway-lab/" style="color:var(--acc)">RPC gateway lab ↗</a></p>
+
+  <nav class="pager">
+    <a href="../signing-policy-engine/">← Automated signing behind a policy engine</a>
+    <a href="../">All work</a>
+    <a href="../agent-guardrails/">AI agent with deterministic guardrails →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

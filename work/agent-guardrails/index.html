@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI agent with deterministic guardrails — Phi Tran</title>
+<meta name="description" content="A model that plans on-chain actions, never trusted to sign them." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/agent-guardrails/" />
+<meta property="og:title" content="AI agent with deterministic guardrails — Phi Tran" />
+<meta property="og:description" content="A model that plans on-chain actions, never trusted to sign them." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/agent-guardrails/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Case study</p>
+    <span class="pill">Agents · Execution</span>
+    <h1 class="detail-title">AI agent with deterministic guardrails</h1>
+    <p class="detail-sum">A model that plans on-chain actions, never trusted to sign them.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  LLM ─ proposes
+    │
+    ▼  quote · simulate
+  [ policy check ]
+    │
+    ▼  deterministic code
+       disposes</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Stack</dt><dd>TypeScript · NestJS · LLM tool calling · EVM</dd>
+      <dt>Surface</dt><dd>Natural-language intent → executed trade</dd>
+      <dt>Hard part</dt><dd>Usefulness and trustworthiness come from opposite properties</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The problem</p>
+    <div class="prose"><p>A language model planning on-chain actions is useful precisely because it is not deterministic — it can handle an instruction nobody wrote a branch for. That is the same property that makes it unsafe to hand a signing key.</p><p>The naive integration gives the model tools and lets it call them. That works in a demo and fails the first time a malformed plan, a hallucinated address or a prompt-injected instruction reaches something irreversible.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Approach</p>
+    <div class="prose"><p><b>The model proposes, deterministic code disposes.</b> The agent produces a structured plan, never a transaction. Everything after that is ordinary software: quotes fetched across venues, the plan simulated against current state, then the same policy layer that guards human-initiated actions evaluates it.</p><p>A model-initiated action gets no special path and no elevated authority. If it exceeds a limit or targets an address outside the allowlist, it is refused exactly as a human request would be.</p><p>Every step the model touches is recorded and replayable — the prompt, the plan, the quotes, the simulation result, the policy verdict — so a bad outcome can be reconstructed rather than guessed at.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Trade-offs</p>
+    <div class="prose"><p>The agent is slower and narrower than letting it call tools freely, and a meaningful share of what it proposes is rejected before execution. <b>That is the design working, not failing</b> — but it does mean the demo is less impressive than the unconstrained version.</p><p>It also moves the hard problem rather than removing it: the policy layer now has to be right, and expressing intent as a structured plan is real engineering work that grows with each new action type.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../rpc-gateway/">← RPC gateway with head-lag detection</a>
+    <a href="../">All work</a>
+    <a href="../perp-dex-architectures/">Three perpetual DEX architectures, compared →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

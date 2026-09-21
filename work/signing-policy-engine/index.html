@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Automated signing behind a policy engine — Phi Tran</title>
+<meta name="description" content="Separating the ability to sign from the authority to sign." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/signing-policy-engine/" />
+<meta property="og:title" content="Automated signing behind a policy engine — Phi Tran" />
+<meta property="og:description" content="Separating the ability to sign from the authority to sign." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/signing-policy-engine/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Case study</p>
+    <span class="pill">Keys · Custody</span>
+    <h1 class="detail-title">Automated signing behind a policy engine</h1>
+    <p class="detail-sum">Separating the ability to sign from the authority to sign.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  intent ──▶ [ policy ]
+              │  limit?
+              │  allowlist?
+              │  rate?
+         pass ▼   fail ──▶ human
+            signer</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Stack</dt><dd>Go · PostgreSQL · KMS / HSM boundary</dd>
+      <dt>Surface</dt><dd>Intent in, signed transaction out</dd>
+      <dt>Hard part</dt><dd>The key was never the weak point</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — The problem</p>
+    <div class="prose"><p>A trading bot that signs without a human in the loop holds a hot key. That key carries the authority of everything it can reach — which, without constraints, is the whole treasury.</p><p>Most custody discussion is about protecting the key: HSMs, MPC, encrypted storage. All useful, and all answering a different question. <b>Protecting the key is not the same problem as constraining the decision to sign.</b> The 2025 Bybit incident is the clean illustration: no key was broken; a signer was shown one transaction and asked to sign another.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — Approach</p>
+    <div class="prose"><p>The signer became the narrowest component in the system, and everything interesting moved in front of it.</p><p>A policy layer sits between intent and signature and evaluates every request against explicit rules: per-action value limits, destination allowlists, rate caps per window, and which contract methods are callable at all. Rules are data, versioned and reviewable, not conditionals scattered through business logic.</p><p>Anything outside policy <b>escalates to a human rather than failing open</b>. That direction matters: the default on an unrecognised request is refusal, not best-effort execution.</p><p>Every decision — allowed, denied, escalated — is written to an append-only log before the signature happens, so the audit trail exists even if the transaction never lands.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — Trade-offs</p>
+    <div class="prose"><p>More moving parts, and latency added to every transaction on the path. For a latency-sensitive strategy that cost is real and has to be measured, not assumed away.</p><p>Policy also has an operational cost nobody mentions up front: rules drift out of date, and an over-tight rule that blocks legitimate flow at 3am is its own kind of outage. The escalation path has to be staffed to be meaningful.</p><p>Bought in exchange: a bounded blast radius. A compromised process can do only what policy already permits, and the ceiling is a number someone chose deliberately.</p></div>
+  </section>
+
+
+  <nav class="pager">
+    <a href="../reorg-safe-indexer/">← Reorg-safe event indexer</a>
+    <a href="../">All work</a>
+    <a href="../rpc-gateway/">RPC gateway with head-lag detection →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RPC gateway lab — Phi Tran</title>
+<meta name="description" content="Go gateway plus two anvil nodes at different block times, so lag detection has something to detect." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/rpc-gateway-lab/" />
+<meta property="og:title" content="RPC gateway lab — Phi Tran" />
+<meta property="og:description" content="Go gateway plus two anvil nodes at different block times, so lag detection has something to detect." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/rpc-gateway-lab/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Work</a> <span>/</span> Lab</p>
+    <span class="pill">Runnable · Go</span>
+    <h1 class="detail-title">RPC gateway lab</h1>
+    <p class="detail-sum">Go gateway plus two anvil nodes at different block times, so lag detection has something to detect.</p>
+
+    <div class="detail-art">
+      <span class="bk tl"></span><span class="bk br"></span>
+<pre>  $ go test -race ./...
+  ok  gateway  1.543s
+  ─────────────────────
+  allowlist · rate limit
+  lag detect · failover
+  7 deterministic tests</pre>
+    </div>
+
+    <dl class="cap detail-meta">
+      <dt>Run</dt><dd>go test -race ./... · docker compose up</dd>
+      <dt>Stack</dt><dd>Go standard library only · Docker · anvil</dd>
+      <dt>Proves</dt><dd>Seven properties, deterministically</dd>
+    </dl>
+  </div>
+
+  <section class="rv">
+    <p class="lab">01 — What it is</p>
+    <div class="prose"><p>A working JSON-RPC gateway in Go, with a compose file that brings up two anvil nodes on different block times — one fast, one deliberately slow — so head-lag detection has a real gap to find rather than a mocked one.</p><p>No external Go dependencies. The whole thing is standard library, which keeps the test surface honest.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">02 — What the tests prove</p>
+    <div class="prose"><p>Seven tests, each asserting one property rather than exercising a happy path:</p><p>• <code>admin_*</code> is rejected before reaching any upstream — verified by asserting zero upstream hits, not just an error response.<br />• A 500 from the primary fails over to the secondary, and the fallback is counted.<br />• Given heads of 100 and 120 with a threshold of 5, the lagging node is marked and traffic routes to the fresh one.<br />• A 65 536-block <code>eth_getLogs</code> range is refused before it reaches a node; a 256-block range passes.<br />• Three <code>eth_chainId</code> calls produce one upstream hit and two cache hits.<br />• A burst of three passes and the fourth returns 429, then a refill lets the next through — using an <b>injected clock</b>, so there is no sleeping in tests.<br />• <code>/health</code> reports probed heights and flags.</p></div>
+  </section>
+
+  <section class="rv">
+    <p class="lab">03 — The part worth copying</p>
+    <div class="prose"><p>The rate limiter takes its clock as a dependency. That one decision is why the test suite is deterministic and finishes in about a second and a half instead of being a flaky timing test. <b>Anything that reads wall-clock time in production should read an injected clock in tests</b>, and concurrency tests are where that pays off most.</p><p>The failover drill is also worth running by hand: stop the primary container, watch the health endpoint flip, then start it again and watch the freshly restarted node be marked as lagging — because a node that just came back is the oldest one in the pool.</p></div>
+  </section>
+
+    <p class="note" style="margin-top:34px">Related — <a href="../rpc-gateway/" style="color:var(--acc)">RPC gateway with head-lag detection ↗</a></p>
+
+  <nav class="pager">
+    <a href="../inside-graph-node/">← What graph-node does when you deploy a subgraph</a>
+    <a href="../">All work</a>
+    <a href="../subgraph-lab/">Self-hosted subgraph stack →</a>
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All work</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../../#about">ABOUT</a>
+    <a href="../">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../../assets/site.js"></script>
+</body>
+</html>

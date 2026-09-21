@@ -1,0 +1,223 @@
+[
+  {
+    "slug": "reorg-safe-indexer",
+    "title": "Reorg-safe event indexer",
+    "cat": "case",
+    "tag": "Case study",
+    "kind": "On-chain data · Settlement",
+    "summary": "Hash-chain verification, rollback-able schema, confirmation tiers by value.",
+    "ascii": "  block N-1 ──┬── hash ok\n  block N   ──┘\n      │  parent mismatch\n      ▼\n   revert range → re-index\n   ──────────────────────\n   tier: value → confirms",
+    "meta": [["Stack", "Node.js · Kafka · PostgreSQL · Redis"], ["Surface", "EVM logs → derived state → query API"], ["Hard part", "Being wrong is worse than being late"]],
+    "sections": [
+      ["The problem", "<p>Chain data is not final when you first see it. A block that exists now can be orphaned a few seconds later, and every row you derived from it becomes fiction. An indexer that treats a recent block as settled is a bug waiting for a reorg.</p><p>The failure is asymmetric. If a deposit is credited late, a user complains. If it is credited from a block that then disappears, the ledger is short and nobody finds out until reconciliation. <b>One direction is recoverable, the other costs money.</b></p>"],
+      ["Approach", "<p>Three decisions carry most of the weight.</p><p><b>Verify the chain, not the number.</b> Every ingested block carries its parent hash. Before applying it, the indexer checks that parent against the block it already has at that height. A mismatch means a fork, detected at ingestion instead of at reconciliation.</p><p><b>Make reverting a delete.</b> Entities are stored as versions keyed by the block range they were valid for, rather than as mutable rows. Undoing a fork becomes deleting every version whose range opens after the fork point — no compensating updates, no repair logic to get subtly wrong.</p><p><b>Tier confirmations by value.</b> A small transfer clears after a few confirmations. A large one waits for finality. The confirmation policy is a function of amount, not a single global constant, because the cost of being wrong is not uniform.</p>"],
+      ["Trade-offs", "<p>Large deposits settle noticeably slower, and that is a product decision as much as a technical one — it has to be explained to whoever owns the user experience.</p><p>The version-range schema is heavier than a flat table: more rows, more storage, and queries need a point-in-time predicate rather than a plain select. In exchange, time-travel queries come free and reorg handling stops being special-case code.</p><p><b>What I would not do again:</b> treating the reorg path as an edge case to handle later. It has to be in the schema from the first migration, because retrofitting rollback onto mutable rows means rewriting the data model under a live system.</p>"]
+    ]
+  },
+  {
+    "slug": "signing-policy-engine",
+    "title": "Automated signing behind a policy engine",
+    "cat": "case",
+    "tag": "Case study",
+    "kind": "Keys · Custody",
+    "summary": "Separating the ability to sign from the authority to sign.",
+    "ascii": "  intent ──▶ [ policy ]\n              │  limit?\n              │  allowlist?\n              │  rate?\n         pass ▼   fail ──▶ human\n            signer",
+    "meta": [["Stack", "Go · PostgreSQL · KMS / HSM boundary"], ["Surface", "Intent in, signed transaction out"], ["Hard part", "The key was never the weak point"]],
+    "sections": [
+      ["The problem", "<p>A trading bot that signs without a human in the loop holds a hot key. That key carries the authority of everything it can reach — which, without constraints, is the whole treasury.</p><p>Most custody discussion is about protecting the key: HSMs, MPC, encrypted storage. All useful, and all answering a different question. <b>Protecting the key is not the same problem as constraining the decision to sign.</b> The 2025 Bybit incident is the clean illustration: no key was broken; a signer was shown one transaction and asked to sign another.</p>"],
+      ["Approach", "<p>The signer became the narrowest component in the system, and everything interesting moved in front of it.</p><p>A policy layer sits between intent and signature and evaluates every request against explicit rules: per-action value limits, destination allowlists, rate caps per window, and which contract methods are callable at all. Rules are data, versioned and reviewable, not conditionals scattered through business logic.</p><p>Anything outside policy <b>escalates to a human rather than failing open</b>. That direction matters: the default on an unrecognised request is refusal, not best-effort execution.</p><p>Every decision — allowed, denied, escalated — is written to an append-only log before the signature happens, so the audit trail exists even if the transaction never lands.</p>"],
+      ["Trade-offs", "<p>More moving parts, and latency added to every transaction on the path. For a latency-sensitive strategy that cost is real and has to be measured, not assumed away.</p><p>Policy also has an operational cost nobody mentions up front: rules drift out of date, and an over-tight rule that blocks legitimate flow at 3am is its own kind of outage. The escalation path has to be staffed to be meaningful.</p><p>Bought in exchange: a bounded blast radius. A compromised process can do only what policy already permits, and the ceiling is a number someone chose deliberately.</p>"]
+    ]
+  },
+  {
+    "slug": "rpc-gateway",
+    "title": "RPC gateway with head-lag detection",
+    "cat": "case",
+    "tag": "Case study",
+    "kind": "Infrastructure · Reliability",
+    "summary": "Detect the lie, not the consequence. Refuse rather than serve stale.",
+    "ascii": "  app ──▶ gateway\n           ├─ probe head\n           ├─ lag > N? skip\n           ├─ 5xx? failover\n           └─ getLogs cap\n          ▼ freshest node",
+    "meta": [["Stack", "Go standard library · Docker · anvil"], ["Surface", "One internal URL for every service"], ["Hard part", "A lying upstream returns HTTP 200"]],
+    "sections": [
+      ["The problem", "<p>A single RPC URL is an invisible trust boundary. Every service reads chain state through it, and it can be wrong in a way that looks exactly like being right.</p><p>A provider serving a head from forty minutes ago does not return an error. It returns <b>stale truth</b> with a 200, and every consumer downstream acts on it confidently. Meanwhile the bill grows in ways nobody predicted, because <code>eth_getLogs</code> is priced per compute unit and one careless backfill range can cost more than a month of node hosting.</p>"],
+      ["Approach", "<p>Every service talks to one internal gateway instead of a provider URL, and the gateway owns all the policy that would otherwise be copy-pasted into each client.</p><p>It probes each upstream's head on a short interval and marks any source more than N blocks behind the best as lagging — a source that is <i>up</i> but <i>behind</i> is treated as unavailable, because for reading money it is. It fails over on 5xx and timeouts, caps <code>eth_getLogs</code> block ranges before they reach a node, allowlists methods so <code>admin_</code> and <code>debug_</code> can never be reached from outside, and rate-limits with a token bucket so one buggy loop cannot take down the node.</p><p>The decision worth arguing about: <b>when only lagging sources remain, it refuses to answer.</b> For a bot that signs transactions, an error is recoverable and a stale answer is not.</p>"],
+      ["Trade-offs", "<p>An extra network hop on every call, and a new component that itself has to be operated, monitored and kept available — the gateway is now a dependency of everything.</p><p>Bought: the ability to detect the lie instead of discovering the consequence, plus a single place to change provider mix, limits and caching without touching service code.</p><p>There is a runnable version of this with deterministic tests — fake upstreams and an injected clock, so lag detection and failover are tested without waiting on real chain timing.</p>"]
+    ],
+    "related": "rpc-gateway-lab"
+  },
+  {
+    "slug": "agent-guardrails",
+    "title": "AI agent with deterministic guardrails",
+    "cat": "case",
+    "tag": "Case study",
+    "kind": "Agents · Execution",
+    "summary": "A model that plans on-chain actions, never trusted to sign them.",
+    "ascii": "  LLM ─ proposes\n    │\n    ▼  quote · simulate\n  [ policy check ]\n    │\n    ▼  deterministic code\n       disposes",
+    "meta": [["Stack", "TypeScript · NestJS · LLM tool calling · EVM"], ["Surface", "Natural-language intent → executed trade"], ["Hard part", "Usefulness and trustworthiness come from opposite properties"]],
+    "sections": [
+      ["The problem", "<p>A language model planning on-chain actions is useful precisely because it is not deterministic — it can handle an instruction nobody wrote a branch for. That is the same property that makes it unsafe to hand a signing key.</p><p>The naive integration gives the model tools and lets it call them. That works in a demo and fails the first time a malformed plan, a hallucinated address or a prompt-injected instruction reaches something irreversible.</p>"],
+      ["Approach", "<p><b>The model proposes, deterministic code disposes.</b> The agent produces a structured plan, never a transaction. Everything after that is ordinary software: quotes fetched across venues, the plan simulated against current state, then the same policy layer that guards human-initiated actions evaluates it.</p><p>A model-initiated action gets no special path and no elevated authority. If it exceeds a limit or targets an address outside the allowlist, it is refused exactly as a human request would be.</p><p>Every step the model touches is recorded and replayable — the prompt, the plan, the quotes, the simulation result, the policy verdict — so a bad outcome can be reconstructed rather than guessed at.</p>"],
+      ["Trade-offs", "<p>The agent is slower and narrower than letting it call tools freely, and a meaningful share of what it proposes is rejected before execution. <b>That is the design working, not failing</b> — but it does mean the demo is less impressive than the unconstrained version.</p><p>It also moves the hard problem rather than removing it: the policy layer now has to be right, and expressing intent as a structured plan is real engineering work that grows with each new action type.</p>"]
+    ]
+  },
+
+  {
+    "slug": "perp-dex-architectures",
+    "title": "Three perpetual DEX architectures, compared",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "One constraint, three architectures — and different things to trust.",
+    "ascii": "  GMX        pool is counterparty\n  Hyperliquid  own L1, on-chain CLOB\n  Nado       off-chain match,\n             on-chain risk engine",
+    "meta": [["Read at", "Protocol docs and contracts, not summaries"], ["Covers", "GMX · Hyperliquid · Nado"], ["Question", "Who is the counterparty, and who do you trust?"]],
+    "sections": [
+      ["Why compare these three", "<p>All three solve the same constraint — a real order book needs millisecond latency, and block times do not provide it — and each answers differently. Put side by side, the comparison exposes what a perp DEX actually has to decide.</p>"],
+      ["GMX — the pool is the counterparty", "<p>There is no matching. Traders open positions against a shared liquidity pool (GLP in v1, GM pools in v2), and liquidity providers take the other side of every trade's profit and loss. Price comes from an oracle rather than from an order book, which is why v1 advertised zero price impact.</p><p>Orders are requests executed by keepers a short time later, so the fill price is the price at execution, not at submission. What you trust: the oracle, and the pool parameters.</p>"],
+      ["Hyperliquid — build the chain to fit the book", "<p>Rather than accept block-time constraints, Hyperliquid runs its own L1 where matching happens inside consensus. A fully on-chain central-limit order book, with validators doing the matching a centralized exchange would do on an internal server.</p><p>Integration looks more like a CEX than a contract call — REST and WebSocket, orders signed with EIP-712. What you trust: the validator set of a young chain.</p>"],
+      ["Nado — split matching from risk", "<p>Matching runs off-chain in a sequencer at single-digit milliseconds; the clearinghouse and risk engine stay on-chain, on Ink (an OP Stack L2). The sequencer can order and match but holds no custody and cannot forge signatures — withdrawals and liquidations all require on-chain verification.</p><p>What you trust: the sequencer for ordering and liveness, plus the L2 beneath it. The MEV argument is economic rather than cryptographic — millisecond latency and batching make extraction unprofitable, which is a claim worth checking rather than accepting.</p>"],
+      ["What the comparison teaches", "<p>The question is never \"which is best\". It is <b>what are you willing to trust, and what does that buy</b>: a pool's parameters and oracle, a new validator set, or a sequencer's ordering. Every perp design pays for speed somewhere, and the three pay in different currencies.</p>"]
+    ]
+  },
+  {
+    "slug": "oracles-push-vs-pull",
+    "title": "Oracles: push versus pull",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "Why the update model changes your liquidation design.",
+    "ascii": "  push (Chainlink)\n    DON ──▶ writes on-chain\n  pull (Pyth)\n    Hermes ──▶ you submit\n    + confidence interval",
+    "meta": [["Covers", "Chainlink · Pyth"], ["Angle", "How the update model reshapes the consumer"], ["Watch for", "Staleness, and ignoring confidence"]],
+    "sections": [
+      ["Two different shapes", "<p>Chainlink <b>pushes</b>: a decentralized oracle network aggregates off-chain, and nodes write the price on-chain when it deviates past a threshold or a heartbeat elapses. Reading is free and the value is simply there — possibly slightly old.</p><p>Pyth <b>pulls</b>: first-party publishers submit prices to an appchain at sub-second frequency, but nothing reaches your chain until a consumer fetches a signed update from Hermes and submits it, paying the gas, typically in the same transaction as the action that uses it.</p>"],
+      ["Why it changes your architecture", "<p>With push, the natural design is a poller and a cache: read the feed, store it, let the engine consume it. With pull there is nothing to poll — the update fetch belongs inline with the transaction, as close to execution as possible. The same liquidation bot is structured differently depending on which you use.</p><p>Pyth also returns a <b>confidence interval</b> alongside the price. Used properly, a widening interval is a signal to be more conservative — exactly when publishers disagree, which is exactly when markets are violent. Ignoring it throws away the most useful field in the response.</p>"],
+      ["The failure modes to design around", "<p>Staleness is the shared risk and it is silent: an old price is still a number. Chainlink consumers must check the round timestamp themselves; Pyth ships a built-in guard via a max-age parameter that reverts instead of returning something stale.</p><p>Both have a trust layer worth naming: a decentralized node network for one, and for the other an attestation path that is not operated by the oracle project itself. <b>An oracle is a ceiling on how safe a lending or perp protocol can be</b> — no downstream design compensates for a price that is wrong.</p>"]
+    ]
+  },
+  {
+    "slug": "lending-internals",
+    "title": "Lending protocol internals",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "Aave's pooled model against Compound's Comet, and why each liquidates differently.",
+    "ascii": "  health = Σ w · amount · price\n  maintenance < 0 ──▶ liquidate\n  ─────────────────────────────\n  Aave: pooled reserves\n  Comet: one base asset",
+    "meta": [["Covers", "Aave v3 · Compound v3 (Comet)"], ["Angle", "Risk isolation as an architectural choice"], ["Question", "What happens when the liquidator does not show up?"]],
+    "sections": [
+      ["The shared skeleton", "<p>Both protocols are the same idea: deposit collateral, borrow against it, stay above a health threshold or be liquidated. Rates move algorithmically with utilisation, and an oracle decides what the collateral is worth. Where they differ is in how risk is partitioned — and that single decision propagates into everything else.</p>"],
+      ["Aave — pooled reserves", "<p>Every listed asset is a reserve in a shared pool; collateral can be lent out, and an account's health factor aggregates weighted collateral against weighted debt. Depositors earn on everything they supply.</p><p>Risk is shared, so a bad listing is a pool-wide problem — which is why v3 added isolation mode with per-asset debt ceilings and eMode for correlated pairs. The features are patches over the pooled model's central weakness.</p>"],
+      ["Compound v3 — one borrowable asset per market", "<p>Comet inverts it: each market has a single borrowable base asset, and collateral is <b>never lent out</b>. Collateral therefore earns no yield — a real cost paid for a real benefit, which is that a collateral asset misbehaving cannot drain lenders of an unrelated asset.</p><p>Liquidation is two-step: the protocol absorbs an underwater position into its own balance sheet first, and only later sells the collateral. That removes the requirement for a well-capitalised liquidator to be present at exactly the wrong moment — the protocol becomes the buyer of last resort, funded by reserves.</p>"],
+      ["What to take from it", "<p>The interesting question in a lending protocol is not the interest-rate curve, it is <b>who eats the loss when liquidation fails</b>. Aave answers with liquidator incentives and parameter tuning; Comet answers with reserves and a two-step absorb. Both answers are defensible, and both tell you exactly where the protocol expects to break.</p>"]
+    ]
+  },
+  {
+    "slug": "cross-chain-messaging",
+    "title": "Cross-chain messaging internals",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "LayerZero's split between who verifies a message and who delivers it.",
+    "ascii": "  OApp ──▶ Endpoint\n             │\n        DVN verify (M-of-N)\n             │\n        Executor deliver\n   verify ≠ execute",
+    "meta": [["Covers", "LayerZero V2 — Endpoint, DVN, Executor"], ["Angle", "Where the trust actually sits"], ["Question", "Who is allowed to assert what happened elsewhere?"]],
+    "sections": [
+      ["The first-principles problem", "<p>Two chains cannot read each other's state. Any cross-chain message therefore reduces to one question: <b>who is allowed to assert that something happened on chain A, and under what conditions does chain B believe them?</b> Every bridge design is an answer to that, and most bridge failures are the answer being weaker than advertised.</p>"],
+      ["The architecture", "<p>An application contract talks to an Endpoint on each chain. Verification is performed by <b>DVNs</b> — decentralized verifier networks — in an M-of-N configuration the application itself chooses. Delivery is performed separately by an <b>Executor</b>.</p><p>Splitting verification from execution is the design's core insight. A message can be verified but undelivered — the Executor being unavailable is an inconvenience, not a loss of safety — and delivery can be retried without repeating verification.</p><p>Per-pathway configuration sets how many source-chain confirmations are required before a message is considered verifiable, which is the cross-chain equivalent of a finality tier.</p>"],
+      ["Where it can still go wrong", "<p>The application chooses its DVN set, so the security of a given pathway is the security of that choice — a cheap single-verifier configuration is a single point of trust wearing decentralized clothing. This is configuration, not protocol, and it is the first thing to inspect when evaluating an integration.</p><p>Replay protection comes from nonces and a per-message identifier; ordering guarantees are per-pathway, not global. <b>Any token transfer built on top must have a conservation invariant that can be reconciled independently</b>, because \"the message said so\" is not an accounting record.</p>"]
+    ]
+  },
+  {
+    "slug": "smart-contract-multisig",
+    "title": "How a smart-contract multisig works",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "How Safe verifies M-of-N on-chain, and where Modules quietly bypass it.",
+    "ascii": "  SafeProxy ──delegatecall──▶\n      singleton (audited)\n  checkSignatures M-of-N\n  Modules bypass threshold\n  Guards run pre + post",
+    "meta": [["Covers", "Safe — proxy, signatures, Modules, Guards"], ["Angle", "Where the authority actually lives"], ["Question", "What is the signer looking at when they approve?"]],
+    "sections": [
+      ["Proxy and singleton", "<p>Logic lives in one audited singleton deployed once per network. Each user's Safe is a minimal proxy that delegatecalls into it while keeping its own storage — owners, threshold, nonce, modules, guard. Creating a Safe is therefore cheap, and every Safe on a given version shares one well-reviewed implementation.</p>"],
+      ["Verification happens on-chain", "<p>Signatures are collected off-chain and checked on-chain in a single execute call. Three signature kinds are accepted: standard EIP-712 signatures, a pre-approved hash recorded by an owner, and a contract signature via EIP-1271 — which is how <b>a Safe can be an owner of another Safe</b>.</p><p>Off-chain coordination (the Transaction Service) stores pending transactions and collects approvals, but it is explicitly not the source of truth. Only the contract decides whether a transaction is authorised.</p>"],
+      ["Modules and Guards — the parts that surprise people", "<p>A <b>Module</b> is a contract authorised to execute through the Safe while bypassing the threshold check entirely. That is the feature — it is how spending limits, recurring payments, recovery flows and session keys are built — and it is also the part most people miss when they assume M-of-N covers every path. Auditing a Safe means auditing its modules.</p><p>A <b>Guard</b> runs before and after every transaction on the normal signing path and can revert even when signatures are valid, which is where automated policy belongs.</p>"],
+      ["The failure mode that matters", "<p>Ronin showed enough valid signatures controlled by too few parties. Bybit showed something sharper: no key broken, signatures valid, but the interface showed signers one transaction while their devices signed another hash. <b>A multisig protects against a stolen key, not against every signer being shown the same lie.</b> Verifying the hash independently of the interface proposing it is the control that closes that gap.</p>"]
+    ]
+  },
+  {
+    "slug": "inside-graph-node",
+    "title": "What graph-node does when you deploy a subgraph",
+    "cat": "research",
+    "tag": "Research",
+    "kind": "Protocol internals",
+    "summary": "Where a subgraph stops being right and a custom indexer starts.",
+    "ascii": "  entity rows keyed by\n  [block_from, block_to)\n  reorg ──▶ drop versions\n  POI = hash of all writes\n  grafting skips re-index",
+    "meta": [["Covers", "graph-node internals · The Graph network"], ["Angle", "Operating it, not just deploying to it"], ["Question", "Read side or money path?"]],
+    "sections": [
+      ["The contract you sign", "<p>Three files define everything: a manifest saying what to watch and from which block, a schema defining entities as tables, and mappings compiled to WASM that turn events into entities. graph-node is the runtime — it ingests blocks, runs handlers, stores entities and serves GraphQL — and it guarantees that the same manifest produces the same data everywhere. That guarantee is why mappings must be deterministic: no clock, no randomness, no HTTP.</p>"],
+      ["How reorgs are free", "<p>Every <code>save()</code> writes a <i>version</i> row carrying the block range it is valid for. Time-travel queries fall out of that design, and so does reorg handling: reverting means dropping versions whose range opens after the fork point. The ingestor keeps recent ancestors and detects forks by parent hash, with a configurable maximum depth it will tolerate.</p><p>You write no reorg code — but your dashboards still see numbers move backwards for a few seconds, so the application layer cannot pretend it did not happen.</p>"],
+      ["Operating it", "<p>The indexing-status endpoint is the real monitoring surface: synced, health, fatal error, and the gap between chain head and latest indexed block. Alert on that gap. A handler that throws stops the subgraph at that block until a fix is deployed, and a schema change means re-indexing from scratch — which is why <b>grafting</b> exists, letting a new version continue from an existing one, and why <b>pruning</b> exists to stop version history from filling the database.</p><p>graph-node also needs a good RPC underneath it, which is where this connects back to the gateway work.</p>"],
+      ["The decision it forces", "<p>A subgraph gives you reorg handling and time travel for free, in exchange for fixed GraphQL, no aggregation, no joins against off-chain data and no non-deterministic logic. That makes it excellent for a read side and wrong for a ledger.</p><p>The rule I settled on: <b>subgraph for the read side, custom indexer for the money path</b> — both reading the same chain, neither acting as the other's source of truth.</p>"]
+    ],
+    "related": "subgraph-lab"
+  },
+
+  {
+    "slug": "rpc-gateway-lab",
+    "title": "RPC gateway lab",
+    "cat": "lab",
+    "tag": "Lab",
+    "kind": "Runnable · Go",
+    "summary": "Go gateway plus two anvil nodes at different block times, so lag detection has something to detect.",
+    "ascii": "  $ go test -race ./...\n  ok  gateway  1.543s\n  ─────────────────────\n  allowlist · rate limit\n  lag detect · failover\n  7 deterministic tests",
+    "meta": [["Run", "go test -race ./... · docker compose up"], ["Stack", "Go standard library only · Docker · anvil"], ["Proves", "Seven properties, deterministically"]],
+    "sections": [
+      ["What it is", "<p>A working JSON-RPC gateway in Go, with a compose file that brings up two anvil nodes on different block times — one fast, one deliberately slow — so head-lag detection has a real gap to find rather than a mocked one.</p><p>No external Go dependencies. The whole thing is standard library, which keeps the test surface honest.</p>"],
+      ["What the tests prove", "<p>Seven tests, each asserting one property rather than exercising a happy path:</p><p>• <code>admin_*</code> is rejected before reaching any upstream — verified by asserting zero upstream hits, not just an error response.<br />• A 500 from the primary fails over to the secondary, and the fallback is counted.<br />• Given heads of 100 and 120 with a threshold of 5, the lagging node is marked and traffic routes to the fresh one.<br />• A 65 536-block <code>eth_getLogs</code> range is refused before it reaches a node; a 256-block range passes.<br />• Three <code>eth_chainId</code> calls produce one upstream hit and two cache hits.<br />• A burst of three passes and the fourth returns 429, then a refill lets the next through — using an <b>injected clock</b>, so there is no sleeping in tests.<br />• <code>/health</code> reports probed heights and flags.</p>"],
+      ["The part worth copying", "<p>The rate limiter takes its clock as a dependency. That one decision is why the test suite is deterministic and finishes in about a second and a half instead of being a flaky timing test. <b>Anything that reads wall-clock time in production should read an injected clock in tests</b>, and concurrency tests are where that pays off most.</p><p>The failover drill is also worth running by hand: stop the primary container, watch the health endpoint flip, then start it again and watch the freshly restarted node be marked as lagging — because a node that just came back is the oldest one in the pool.</p>"]
+    ],
+    "related": "rpc-gateway"
+  },
+  {
+    "slug": "subgraph-lab",
+    "title": "Self-hosted subgraph stack",
+    "cat": "lab",
+    "tag": "Lab",
+    "kind": "Runnable · Docker",
+    "summary": "Full indexing stack end to end: contract, mapping, deploy, GraphQL query.",
+    "ascii": "  docker compose up\n   ├ graph-node\n   ├ ipfs\n   ├ postgres\n   └ anvil\n  forge create → deploy\n  → graph deploy → query",
+    "meta": [["Run", "docker compose up · 4 scripts"], ["Stack", "graph-node · IPFS · PostgreSQL · anvil · Foundry"], ["Proves", "The whole path, not a tutorial fragment"]],
+    "sections": [
+      ["What it is", "<p>The complete indexing stack on one machine: graph-node, IPFS, PostgreSQL and an anvil dev chain, plus a small ERC-20-style contract, a subgraph project and four scripts that take it from nothing to a working GraphQL query.</p><p>Deploy the contract, generate events, build the mapping to WASM, deploy the subgraph, query it. Every step runs; nothing is described and skipped.</p>"],
+      ["Verified output", "<p>After seeding one mint and two transfers, the query returns totals of three transfers, 1350 volume and 1000 minted, with balances of 650 and 350 across two accounts — and the indexing status reports synced with the latest block matching the chain head.</p><p>Those numbers are from an actual run, not an expectation written in advance.</p>"],
+      ["Two things the docs do not warn you about", "<p><b>graph-cli 0.97 requires an explicit <code>immutable</code> argument</b> on every <code>@entity</code> directive. Omit it and the build fails with a message that reads like a schema error rather than a version requirement.</p><p><b>graph-node spends about a minute on Postgres migrations on first start.</b> Deploy during that window and you get a connection reset that looks like a configuration problem but is just a race. The deploy script waits for the status port before proceeding, which is the fix.</p><p>Both cost real time to diagnose, which is exactly why a lab that actually runs is worth more than a tutorial that describes the same steps.</p>"]
+    ],
+    "related": "inside-graph-node"
+  },
+  {
+    "slug": "concurrency-labs",
+    "title": "Concurrency labs",
+    "cat": "lab",
+    "tag": "Lab",
+    "kind": "Runnable · Go & Rust",
+    "summary": "Data races, goroutine leaks and deadlocks made reproducible on demand.",
+    "ascii": "  $ go test -race -run Race\n  WARNING: DATA RACE\n  final = 33719 ≠ 100000\n  ─────────────────────\n  the bug, reproduced\n  deterministically",
+    "meta": [["Run", "go test -race · cargo test"], ["Stack", "Go and Rust standard libraries — no dependencies"], ["Proves", "Two languages, two safety philosophies"]],
+    "sections": [
+      ["What it is", "<p>Concurrency bugs are the class that is hard to reproduce and easy to lose money on. These labs reproduce them on demand instead of waiting for production to do it.</p><p>The Go side covers data races caught by the race detector, goroutine leaks measured against a baseline goroutine count, and four shapes of deadlock — including one in a separate binary that genuinely crashes with <i>all goroutines are asleep</i>.</p>"],
+      ["The comparison that makes it worth doing", "<p>The Rust labs implement the same data race, and the point is where it is caught. Go finds it at <b>runtime</b>, with the race detector, and only if a test happens to exercise the bad interleaving. Rust refuses to <b>compile</b> it.</p><p>The Rust tests assert that refusal explicitly — <code>compile_fail</code> doctests proving the borrow checker rejects use-after-move, two mutable borrows, and sending a non-<code>Send</code> type across threads. A test that asserts code does not compile is an unusual and very direct way to document a language guarantee.</p>"],
+      ["Why it matters for money systems", "<p>A race on a balance update is not a flaky test, it is an incorrect ledger. Having a deterministic reproduction of each failure shape — and knowing which language catches which class, and when — changes how you review concurrent code rather than just how you debug it.</p>"]
+    ]
+  },
+  {
+    "slug": "exploit-fix-labs",
+    "title": "Exploit → fix labs",
+    "cat": "lab",
+    "tag": "Lab",
+    "kind": "Runnable · Foundry",
+    "summary": "Foundry labs where the attack runs, then the patch makes it fail.",
+    "ascii": "  $ forge test\n  [PASS] testExploit()\n  [PASS] testFixed()\n  ─────────────────────\n  reentrancy · oracle\n  first-depositor · sig",
+    "meta": [["Run", "forge test"], ["Stack", "Foundry · Solidity, self-contained"], ["Shape", "Attack passes, then the fix makes it fail"]],
+    "sections": [
+      ["What it is", "<p>Each lab is a vulnerable contract, a test that successfully exploits it, and a patched version where the same exploit fails. Reading about reentrancy and watching a test drain a contract are different kinds of understanding, and only one of them survives an interview.</p><p>Covered: reentrancy, access control and delegatecall, oracle manipulation via flash loan, the ERC-4626 first-depositor rounding attack, and signature replay with EIP-712.</p>"],
+      ["Why exploit-then-fix", "<p>A patch alone teaches a rule. A failing exploit teaches the mechanism — and mechanisms transfer to bugs nobody has named yet, while rules do not.</p><p>Every lab is self-contained with no external dependencies, so each runs in seconds and none of them rot when an upstream library changes.</p>"],
+      ["Scope", "<p>Defensive only. The targets are contracts written for the lab, the point is understanding how to patch, and nothing here is aimed at live systems.</p>"]
+    ]
+  }
+]

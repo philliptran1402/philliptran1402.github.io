@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Work — Phi Tran</title>
+<meta name="description" content="Selected engineering work: money-path case studies, protocol research notes and runnable infrastructure labs." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://philliptran1402.github.io/work/" />
+<meta property="og:title" content="Work — Phi Tran" />
+<meta property="og:description" content="Selected engineering work: money-path case studies, protocol research notes and runnable infrastructure labs." />
+<meta property="og:image" content="https://github.com/philliptran1402.png" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="https://github.com/philliptran1402.png" />
+<link rel="canonical" href="https://philliptran1402.github.io/work/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick c"></span>
+
+<div class="hud">
+  <a class="brand" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b><span class="dot"></span></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+</div>
+
+<div class="wrap">
+
+  <div class="work-head">
+    <div></div>
+    <div>
+      <span class="pill">Selected output</span>
+      <h1 class="work-title" data-scramble>MY WORK</h1>
+    </div>
+  </div>
+
+  <div class="work-body">
+
+    <aside class="filters">
+      <button data-filter="all" aria-pressed="true">All (14)</button>
+      <button data-filter="case" aria-pressed="false">Case study (04)</button>
+      <button data-filter="research" aria-pressed="false">Protocol research (06)</button>
+      <button data-filter="lab" aria-pressed="false">Runnable lab (04)</button>
+      <p class="sub">
+        Case studies are decisions I made<br />
+        and what they cost.<br /><br />
+        Research is protocol internals read<br />
+        at the source.<br /><br />
+        Labs are things that run.
+      </p>
+    </aside>
+
+    <div>
+      <div class="cards">
+        <a class="card rv" data-cat="case" href="reorg-safe-indexer/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  block N-1 ──┬── hash ok
+  block N   ──┘
+      │  parent mismatch
+      ▼
+   revert range → re-index
+   ──────────────────────
+   tier: value → confirms</pre>
+            <span class="tagbox" data-c="case">Case study</span>
+          </div>
+          <div class="card-foot"><h3>Reorg-safe event indexer</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Hash-chain verification, rollback-able schema, confirmation tiers by value.</p>
+        </a>
+        <a class="card rv" data-cat="case" href="signing-policy-engine/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  intent ──▶ [ policy ]
+              │  limit?
+              │  allowlist?
+              │  rate?
+         pass ▼   fail ──▶ human
+            signer</pre>
+            <span class="tagbox" data-c="case">Case study</span>
+          </div>
+          <div class="card-foot"><h3>Automated signing behind a policy engine</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Separating the ability to sign from the authority to sign.</p>
+        </a>
+        <a class="card rv" data-cat="case" href="rpc-gateway/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  app ──▶ gateway
+           ├─ probe head
+           ├─ lag &gt; N? skip
+           ├─ 5xx? failover
+           └─ getLogs cap
+          ▼ freshest node</pre>
+            <span class="tagbox" data-c="case">Case study</span>
+          </div>
+          <div class="card-foot"><h3>RPC gateway with head-lag detection</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Detect the lie, not the consequence. Refuse rather than serve stale.</p>
+        </a>
+        <a class="card rv" data-cat="case" href="agent-guardrails/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  LLM ─ proposes
+    │
+    ▼  quote · simulate
+  [ policy check ]
+    │
+    ▼  deterministic code
+       disposes</pre>
+            <span class="tagbox" data-c="case">Case study</span>
+          </div>
+          <div class="card-foot"><h3>AI agent with deterministic guardrails</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">A model that plans on-chain actions, never trusted to sign them.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="perp-dex-architectures/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  GMX        pool is counterparty
+  Hyperliquid  own L1, on-chain CLOB
+  Nado       off-chain match,
+             on-chain risk engine</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>Three perpetual DEX architectures, compared</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">One constraint, three architectures — and different things to trust.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="oracles-push-vs-pull/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  push (Chainlink)
+    DON ──▶ writes on-chain
+  pull (Pyth)
+    Hermes ──▶ you submit
+    + confidence interval</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>Oracles: push versus pull</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Why the update model changes your liquidation design.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="lending-internals/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  health = Σ w · amount · price
+  maintenance &lt; 0 ──▶ liquidate
+  ─────────────────────────────
+  Aave: pooled reserves
+  Comet: one base asset</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>Lending protocol internals</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Aave&#x27;s pooled model against Compound&#x27;s Comet, and why each liquidates differently.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="cross-chain-messaging/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  OApp ──▶ Endpoint
+             │
+        DVN verify (M-of-N)
+             │
+        Executor deliver
+   verify ≠ execute</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>Cross-chain messaging internals</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">LayerZero&#x27;s split between who verifies a message and who delivers it.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="smart-contract-multisig/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  SafeProxy ──delegatecall──▶
+      singleton (audited)
+  checkSignatures M-of-N
+  Modules bypass threshold
+  Guards run pre + post</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>How a smart-contract multisig works</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">How Safe verifies M-of-N on-chain, and where Modules quietly bypass it.</p>
+        </a>
+        <a class="card rv" data-cat="research" href="inside-graph-node/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  entity rows keyed by
+  [block_from, block_to)
+  reorg ──▶ drop versions
+  POI = hash of all writes
+  grafting skips re-index</pre>
+            <span class="tagbox" data-c="research">Research</span>
+          </div>
+          <div class="card-foot"><h3>What graph-node does when you deploy a subgraph</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Where a subgraph stops being right and a custom indexer starts.</p>
+        </a>
+        <a class="card rv" data-cat="lab" href="rpc-gateway-lab/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  $ go test -race ./...
+  ok  gateway  1.543s
+  ─────────────────────
+  allowlist · rate limit
+  lag detect · failover
+  7 deterministic tests</pre>
+            <span class="tagbox" data-c="lab">Lab</span>
+          </div>
+          <div class="card-foot"><h3>RPC gateway lab</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Go gateway plus two anvil nodes at different block times, so lag detection has something to detect.</p>
+        </a>
+        <a class="card rv" data-cat="lab" href="subgraph-lab/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  docker compose up
+   ├ graph-node
+   ├ ipfs
+   ├ postgres
+   └ anvil
+  forge create → deploy
+  → graph deploy → query</pre>
+            <span class="tagbox" data-c="lab">Lab</span>
+          </div>
+          <div class="card-foot"><h3>Self-hosted subgraph stack</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Full indexing stack end to end: contract, mapping, deploy, GraphQL query.</p>
+        </a>
+        <a class="card rv" data-cat="lab" href="concurrency-labs/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  $ go test -race -run Race
+  WARNING: DATA RACE
+  final = 33719 ≠ 100000
+  ─────────────────────
+  the bug, reproduced
+  deterministically</pre>
+            <span class="tagbox" data-c="lab">Lab</span>
+          </div>
+          <div class="card-foot"><h3>Concurrency labs</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Data races, goroutine leaks and deadlocks made reproducible on demand.</p>
+        </a>
+        <a class="card rv" data-cat="lab" href="exploit-fix-labs/">
+          <div class="thumb">
+            <span class="bk tl"></span><span class="bk br"></span>
+<pre>  $ forge test
+  [PASS] testExploit()
+  [PASS] testFixed()
+  ─────────────────────
+  reentrancy · oracle
+  first-depositor · sig</pre>
+            <span class="tagbox" data-c="lab">Lab</span>
+          </div>
+          <div class="card-foot"><h3>Exploit → fix labs</h3><span class="visit">Read ↗</span></div>
+          <p class="desc">Foundry labs where the attack runs, then the patch makes it fail.</p>
+        </a>
+      </div>
+      <p class="empty" style="display:none">No entries in this category.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← Back home</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="../#about">ABOUT</a>
+    <a href="./">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="../#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>
