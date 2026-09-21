@@ -6,7 +6,6 @@
 <title>Phi Tran — Backend &amp; DeFi Infrastructure Engineer</title>
 <meta name="description" content="Backend engineer, 6+ years, building systems on the money path: perpetual DEX, lending, options, RWA, reorg-safe indexers, automated signing and AI agents with deterministic guardrails." />
 <meta name="author" content="Phi Tran" />
-
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://philliptran1402.github.io/" />
 <meta property="og:title" content="Phi Tran — Backend &amp; DeFi Infrastructure Engineer" />
@@ -14,258 +13,432 @@
 <meta property="og:image" content="https://github.com/philliptran1402.png" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content="Phi Tran — Backend &amp; DeFi Infrastructure Engineer" />
-<meta name="twitter:description" content="Six years building systems where a bug costs money." />
 <meta name="twitter:image" content="https://github.com/philliptran1402.png" />
-
 <link rel="icon" href="https://github.com/philliptran1402.png" />
 <link rel="canonical" href="https://philliptran1402.github.io/" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#0b0c10;
-    --panel:#101116;
-    --line:#212329;
-    --line-soft:#191b20;
-    --fg:#eceef3;
-    --muted:#a2a8b4;
-    --dim:#6d7480;
-    --accent:#4f9cf9;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --bg:#000;
+    --panel:#0a0b0d;
+    --line:rgba(255,255,255,.07);
+    --line-hard:rgba(255,255,255,.14);
+    --fg:#f2f3f5;
+    --muted:#8b9099;
+    --dim:#585d66;
+    --acc:#c5f74f;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--fg);
-    font-family:var(--font);font-size:15.5px;line-height:1.7;
-    -webkit-font-smoothing:antialiased;
-  }
-  a{color:var(--accent);text-decoration:none}
-  a:hover{text-decoration:underline}
-  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
 
-  /* header */
-  header{padding:72px 0 40px}
-  .id{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-  .id img{width:72px;height:72px;border-radius:50%;border:1px solid var(--line);flex:none}
-  h1{font-size:1.72rem;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
-  .role{color:var(--muted);font-size:.95rem;margin:0}
-  .where{font-family:var(--mono);font-size:.74rem;color:var(--dim);margin:3px 0 0}
-  .pitch{font-size:1.06rem;color:var(--fg);margin:0 0 10px;line-height:1.65}
-  .pitch strong{font-weight:600}
-  .sub{color:var(--muted);margin:0 0 22px}
-  .links{display:flex;flex-wrap:wrap;gap:8px}
-  .links a{
-    font-size:.84rem;font-weight:500;color:var(--fg);
-    border:1px solid var(--line);background:var(--panel);
-    padding:7px 14px;border-radius:8px;
-  }
-  .links a:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+  /* ── vertical grid lines ─────────────────────────── */
+  .grid{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .grid i{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+  .grid i:nth-child(1){left:2.2%}
+  .grid i:nth-child(2){left:21.5%}
+  .grid i:nth-child(3){left:43.5%}
+  .grid i:nth-child(4){left:59.5%}
+  .grid i:nth-child(5){left:78.5%}
+  .grid i:nth-child(6){right:2.2%}
+  .tick{position:fixed;width:4px;height:4px;background:#e0503a;z-index:1;pointer-events:none}
+  .tick.a{left:2.2%;top:28%}
+  .tick.b{left:43.5%;top:54%}
+  .tick.c{right:2.2%;top:36%}
 
-  /* sections */
-  section{padding:38px 0;border-top:1px solid var(--line-soft)}
-  h2{
-    font-family:var(--mono);font-size:.72rem;font-weight:500;
-    text-transform:uppercase;letter-spacing:.16em;color:var(--dim);
-    margin:0 0 6px;
+  /* ── fixed HUD ───────────────────────────────────── */
+  .hud{position:fixed;inset:0;z-index:40;pointer-events:none;font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .hud > *{pointer-events:auto}
+  .hud .brand{position:absolute;left:3.2%;top:26px;display:flex;align-items:center;gap:9px;color:var(--fg);font-weight:500}
+  .hud .brand svg{width:13px;height:13px;flex:none}
+  .hud .sys{position:absolute;left:23%;top:26px}
+  .hud .sys b{color:var(--acc);font-weight:500}
+  .hud .loc{position:absolute;left:59.5%;top:26px;line-height:1.75}
+  .hud .geo{position:absolute;left:78.5%;top:26px;line-height:1.75}
+  .hud .menu-btn{
+    position:absolute;right:3.2%;top:18px;
+    border:1px solid var(--line-hard);background:rgba(255,255,255,.04);
+    color:var(--fg);font:inherit;letter-spacing:.16em;text-transform:uppercase;
+    padding:11px 20px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;
   }
-  .hint{color:var(--dim);font-size:.82rem;margin:0 0 24px}
-  p{margin:0 0 14px}
+  .hud .menu-btn:hover{border-color:var(--acc);color:var(--acc);background:rgba(197,247,79,.07)}
+  .hud .scroll{position:absolute;right:1.1%;bottom:110px;writing-mode:vertical-rl;letter-spacing:.42em;font-size:.6rem;color:var(--dim)}
+  .hud .edge{position:absolute;right:2.6%;top:44%;font-size:.7rem;color:var(--fg)}
+  .hud .rot{position:absolute;right:1.1%;top:52%;writing-mode:vertical-rl;letter-spacing:.2em;font-size:.58rem;color:var(--dim);text-transform:none}
+  @media (max-width:900px){
+    .hud .sys,.hud .loc,.hud .geo,.hud .scroll,.hud .edge,.hud .rot{display:none}
+  }
+
+  /* ── hero ────────────────────────────────────────── */
+  .wrap{position:relative;z-index:2;max-width:1500px;margin:0 auto;padding:0 3.2%}
+  .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:58px;position:relative}
+  .hero .mail{
+    position:absolute;left:0;top:19%;font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;
+    color:#25282d;text-transform:uppercase;border-left:1px solid var(--line-hard);padding-left:14px;
+  }
+  .intro{max-width:620px;margin:0 0 auto;padding-top:31vh;font-size:1.02rem;line-height:1.85;color:var(--muted)}
+  .intro b{color:var(--fg);font-weight:500}
+  .intro code{font-family:var(--mono);font-size:.9em;color:var(--acc)}
+  .tagpill{
+    display:inline-block;background:var(--acc);color:#0a0c06;font-family:var(--mono);font-size:.66rem;
+    font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:6px 14px;margin-bottom:20px;
+  }
+  .display{
+    font-weight:200;letter-spacing:-.035em;line-height:.85;margin:0;
+    font-size:clamp(3.2rem,12.5vw,11.5rem);
+  }
+  .display span{display:block}
+  .display .two{padding-left:.06em}
+
+  /* halftone portrait */
+  .portrait{position:absolute;right:6%;bottom:0;width:min(42vw,560px);aspect-ratio:3/4;z-index:-1;opacity:.85}
+  .portrait img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:grayscale(1) contrast(1.35) brightness(.78)}
+  .portrait::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at center,#000 1px,transparent 1.6px) 0 0/4px 4px;
+    mix-blend-mode:overlay;opacity:.85;
+  }
+  .portrait::before{
+    content:"";position:absolute;inset:0;z-index:2;
+    background:linear-gradient(to bottom,transparent 45%,#000 96%);
+  }
+  @media (max-width:900px){.portrait{display:none}}
+
+  /* ── sections ────────────────────────────────────── */
+  section{padding:88px 0;border-top:1px solid var(--line);position:relative}
+  .lab{font-family:var(--mono);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin:0 0 10px;display:flex;align-items:center;gap:10px}
+  .lab::before{content:"";width:16px;height:1px;background:var(--acc)}
+  h2{font-size:clamp(1.9rem,5vw,3.4rem);font-weight:200;letter-spacing:-.03em;line-height:1;margin:0 0 14px}
+  .note{color:var(--dim);font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;margin:0 0 40px}
+  .prose{max-width:660px;color:var(--muted);font-size:1rem}
+  .prose b{color:var(--fg);font-weight:500}
+  .prose p{margin:0 0 15px}
 
   /* case studies */
-  .case{padding:20px 0;border-bottom:1px solid var(--line-soft)}
-  .case:last-child{border-bottom:0;padding-bottom:0}
-  .case h3{font-size:1.02rem;font-weight:600;margin:0 0 4px}
-  .case .ctx{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin:0 0 12px}
-  .case dl{margin:0}
-  .case dt{
-    font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;
-    color:var(--dim);margin:12px 0 3px;
-  }
-  .case dt:first-child{margin-top:0}
-  .case dd{margin:0;color:var(--muted);font-size:.93rem}
-  .case dd strong{color:var(--fg);font-weight:600}
+  .cases{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:8px}
+  .case{background:var(--bg);padding:30px 32px;position:relative;transition:background .2s}
+  .case:hover{background:#060708}
+  .case::before,.case::after{content:"";position:absolute;width:9px;height:9px;opacity:0;transition:opacity .2s}
+  .case::before{left:10px;top:10px;border-left:1px solid var(--acc);border-top:1px solid var(--acc)}
+  .case::after{right:10px;bottom:10px;border-right:1px solid var(--acc);border-bottom:1px solid var(--acc)}
+  .case:hover::before,.case:hover::after{opacity:1}
+  .case-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+  .case h3{font-size:1.16rem;font-weight:400;letter-spacing:-.01em;margin:0}
+  .case .kind{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+  .case .idx{font-family:var(--mono);font-size:.62rem;color:var(--acc);letter-spacing:.14em}
+  .case dl{margin:16px 0 0;display:grid;grid-template-columns:96px 1fr;gap:9px 20px}
+  .case dt{font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+  .case dd{margin:0;color:var(--muted);font-size:.93rem;line-height:1.72}
+  .case dd b{color:var(--fg);font-weight:500}
+  .case dd code{font-family:var(--mono);font-size:.88em;color:var(--acc)}
+  @media (max-width:640px){.case dl{grid-template-columns:1fr;gap:3px}.case dt{margin-top:10px}}
 
   /* writing */
-  .piece{padding:13px 0;border-bottom:1px solid var(--line-soft)}
+  .piece{display:flex;gap:22px;padding:22px 0;border-bottom:1px solid var(--line);align-items:baseline}
   .piece:last-child{border-bottom:0}
-  .piece a{font-weight:500;font-size:.95rem}
-  .piece p{color:var(--muted);font-size:.88rem;margin:3px 0 0}
+  .piece .n{font-family:var(--mono);font-size:.62rem;color:var(--acc);letter-spacing:.14em;flex:none;padding-top:4px}
+  .piece h3{font-size:1.02rem;font-weight:400;margin:0 0 4px;transition:color .15s}
+  .piece:hover h3{color:var(--acc)}
+  .piece p{margin:0;color:var(--muted);font-size:.9rem;max-width:680px}
+  .piece .go{margin-left:auto;font-family:var(--mono);font-size:.68rem;color:var(--dim);flex:none}
 
   /* capabilities */
-  .cap{display:grid;grid-template-columns:132px 1fr;gap:10px 18px;align-items:baseline}
-  .cap dt{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
-  .cap dd{margin:0;color:var(--muted);font-size:.9rem}
+  .cap{display:grid;grid-template-columns:150px 1fr;gap:16px 26px;max-width:900px}
+  .cap dt{font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+  .cap dd{margin:0;color:var(--muted);font-size:.94rem}
   .cap dd b{color:var(--fg);font-weight:500}
+  @media (max-width:640px){.cap{grid-template-columns:1fr;gap:2px}.cap dt{margin-top:14px}}
 
-  footer{padding:38px 0 70px;border-top:1px solid var(--line-soft)}
-  footer p{color:var(--muted);font-size:.9rem}
-  .fine{font-family:var(--mono);font-size:.7rem;color:var(--dim);margin-top:24px}
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:76px 0 60px;position:relative;z-index:2}
+  .big-mail{font-size:clamp(1.3rem,4.4vw,2.9rem);font-weight:200;letter-spacing:-.02em;color:var(--fg);transition:color .15s}
+  .big-mail:hover{color:var(--acc)}
+  .foot-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:44px;font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .foot-row a:hover{color:var(--acc)}
 
-  @media (max-width:600px){
-    header{padding:48px 0 32px}
-    h1{font-size:1.5rem}
-    .id img{width:60px;height:60px}
-    .cap{grid-template-columns:1fr;gap:2px 0}
-    .cap dt{margin-top:10px}
+  /* ── menu overlay ────────────────────────────────── */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.72);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;z-index:50}
+  .scrim.on{opacity:1;visibility:visible}
+  .panel{
+    position:fixed;right:3.2%;top:74px;width:min(430px,86vw);z-index:60;
+    background:#0b0d10;border:1px solid var(--line-hard);border-radius:12px;padding:26px;
+    transform:translateY(-10px);opacity:0;visibility:hidden;transition:opacity .22s,transform .22s,visibility .22s;
+  }
+  .panel.on{opacity:1;visibility:visible;transform:none}
+  .panel-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .close-btn{border:1px solid var(--line-hard);background:rgba(255,255,255,.05);color:var(--fg);font:inherit;letter-spacing:.16em;text-transform:uppercase;padding:9px 16px;cursor:pointer}
+  .close-btn:hover{border-color:var(--acc);color:var(--acc)}
+  .nav{margin:44px 0 52px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+  .nav a{
+    position:relative;background:#e9edd9;color:#0a0c06;font-size:1.65rem;font-weight:500;
+    letter-spacing:-.01em;padding:5px 20px 7px;line-height:1;
+  }
+  .nav a:nth-child(2){background:var(--acc)}
+  .nav a::before,.nav a::after{content:"+";position:absolute;font-family:var(--mono);font-size:.7rem;color:var(--fg)}
+  .nav a::before{right:-5px;top:-9px}
+  .nav a::after{left:-5px;bottom:-9px}
+  .connect{font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+  .conn-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase}
+  .conn-grid a{display:flex;align-items:center;gap:8px;color:var(--muted)}
+  .conn-grid a:hover{color:var(--acc)}
+  .conn-grid .num{color:var(--dim);font-size:.62rem}
+  .conn-grid .arw{margin-left:auto;color:var(--acc)}
+  .panel-foot{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .scrim,.panel,.case,.piece h3,.big-mail{transition:none}
   }
 </style>
 </head>
 <body>
+
+<div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<span class="tick a"></span><span class="tick b"></span><span class="tick c"></span>
+
+<!-- ── HUD ─────────────────────────────────────────── -->
+<div class="hud">
+  <a class="brand" href="/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c5f74f" stroke-width="2"><path d="M12 3 22 20H2z"/></svg>
+    Phi Tran
+  </a>
+  <div class="sys">System — <b>Online</b></div>
+  <div class="loc">Da Nang, VN<br /><span id="clock">--:-- --</span></div>
+  <div class="geo">16°03'16"N<br />108°12'08"E</div>
+  <button class="menu-btn" id="open">Menu</button>
+  <div class="edge">w.</div>
+  <div class="rot">Backend / DeFi</div>
+  <div class="scroll">Scroll down</div>
+</div>
+
 <div class="wrap">
 
-  <header>
-    <div class="id">
-      <img src="https://wsrv.nl/?url=github.com/philliptran1402.png&w=220&h=220&fit=cover&mask=circle&maxage=7d" alt="Phi Tran" width="72" height="72" />
-      <div>
-        <h1>Phi Tran</h1>
-        <p class="role">Backend &amp; DeFi Infrastructure Engineer</p>
-        <p class="where">Da Nang, Vietnam · 6+ years · open to remote</p>
-      </div>
+  <!-- ── HERO ───────────────────────────────────────── -->
+  <div class="hero">
+    <div class="mail">phitranviet99 &nbsp; @gmail.com</div>
+
+    <div class="portrait">
+      <img src="https://wsrv.nl/?url=github.com/philliptran1402.png&w=700&h=933&fit=cover&maxage=7d" alt="Phi Tran" />
     </div>
 
-    <p class="pitch">
-      I build backend systems where <strong>a bug costs money</strong>, not just a bad user experience.
-    </p>
-    <p class="sub">
-      Perpetual DEX, lending, options and RWA platforms; reorg-safe indexing; automated signing behind a
-      policy layer; and lately AI agents that plan on-chain actions without being trusted to sign them.
+    <p class="intro">
+      I build backend systems where <b>a bug costs money</b>, not just a bad user experience.
+      Six years on the money path — perpetual DEX, lending, options, <code>&lt;RWA/&gt;</code> —
+      and lately AI agents that plan on-chain actions without ever being trusted to sign them.
     </p>
 
-    <div class="links">
-      <a href="https://github.com/philliptran1402">GitHub</a>
-      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
-      <a href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <div>
+      <span class="tagpill">Backend / DeFi Infra</span>
+      <h1 class="display"><span>PHI</span><span class="two">TRAN</span></h1>
     </div>
-  </header>
+  </div>
 
-  <section>
-    <h2>Approach</h2>
-    <p>
-      Money-path systems fail differently from product systems. A dropped request is recoverable; a ledger
-      that is wrong in the wrong direction is not. So most of my design effort goes into the failure case
-      rather than the happy path — what happens on a reorg, a stale price, a duplicated retry, a compromised key.
-    </p>
-    <p>
-      The decisions below are the ones I would defend in a design review. Each of them cost something;
-      I have tried to say what.
-    </p>
-  </section>
-
-  <section>
-    <h2>Selected work</h2>
-    <p class="hint">Four decisions, with what each one traded away.</p>
-
-    <div class="case">
-      <h3>Reorg-safe event indexer</h3>
-      <p class="ctx">on-chain data · settlement</p>
-      <dl>
-        <dt>Problem</dt>
-        <dd>An indexer that treats a recent block as final is a bug waiting for a reorg. Credit a deposit on data that later disappears and the ledger is wrong in the direction that loses money.</dd>
-        <dt>Approach</dt>
-        <dd>Verify the parent hash chain on every block rather than trusting block numbers. Store entities keyed by <strong>block range</strong> so a revert is a delete, not a repair. Tier confirmation policy by value — small amounts credit quickly, large amounts wait for finality.</dd>
-        <dt>Trade-off</dt>
-        <dd>Large deposits settle noticeably slower, and the schema is more complex than a flat table. Accepted deliberately: latency is recoverable, an incorrect balance is not.</dd>
-      </dl>
-    </div>
-
-    <div class="case">
-      <h3>Automated signing behind a policy engine</h3>
-      <p class="ctx">keys · custody</p>
-      <dl>
-        <dt>Problem</dt>
-        <dd>A bot that signs without a human in the loop holds a hot key with the authority of the whole treasury. Protecting the key is not the same problem as constraining the <strong>decision to sign</strong>.</dd>
-        <dt>Approach</dt>
-        <dd>Separate the ability to sign from the authority to sign. A policy layer in front of the signer enforces per-action limits, destination allowlists and rate caps; anything outside policy escalates to a human instead of failing open.</dd>
-        <dt>Trade-off</dt>
-        <dd>More moving parts, and latency added to every transaction on the path. Bought in exchange: a bounded blast radius when — not if — something is compromised.</dd>
-      </dl>
-    </div>
-
-    <div class="case">
-      <h3>RPC gateway with head-lag detection</h3>
-      <p class="ctx">infrastructure · reliability</p>
-      <dl>
-        <dt>Problem</dt>
-        <dd>A single RPC URL is an invisible trust boundary. A provider serving a head from forty minutes ago does not return an error — it returns <strong>stale truth</strong>, and everything downstream acts on it confidently.</dd>
-        <dt>Approach</dt>
-        <dd>Every service talks to one internal gateway. It probes each upstream's head, marks any source too far behind as lagging, fails over on errors, caps <code>eth_getLogs</code> ranges and allowlists methods. When only stale sources remain it refuses to answer rather than answering wrongly.</dd>
-        <dt>Trade-off</dt>
-        <dd>An extra hop, plus a component that now has to be operated and monitored itself. Bought: the ability to detect the lie instead of discovering the consequence.</dd>
-      </dl>
-    </div>
-
-    <div class="case">
-      <h3>AI agent with deterministic guardrails</h3>
-      <p class="ctx">agents · execution</p>
-      <dl>
-        <dt>Problem</dt>
-        <dd>A language model planning on-chain actions is useful precisely because it is not deterministic — which is the same reason it cannot be trusted with a signature.</dd>
-        <dt>Approach</dt>
-        <dd>The model proposes, deterministic code disposes: intent, strategy, quotes across venues, simulation, policy check, then signing. Every step the model touches is replayable, and a model-initiated action passes the <strong>same policy layer</strong> a human-initiated one would.</dd>
-        <dt>Trade-off</dt>
-        <dd>The agent is slower and narrower than letting it call tools freely, and a good deal of its output is rejected before execution. That is the design working, not the design failing.</dd>
-      </dl>
+  <!-- ── APPROACH ───────────────────────────────────── -->
+  <section id="about">
+    <p class="lab">01 — Approach</p>
+    <h2>Design for the failure case</h2>
+    <p class="note">Because the happy path was never the hard part</p>
+    <div class="prose">
+      <p>
+        Money-path systems fail differently from product systems. A dropped request is recoverable;
+        a ledger that is wrong in the wrong direction is not. So most of my design effort goes into
+        what happens on <b>a reorg, a stale price, a duplicated retry, a compromised key</b> — not into
+        the path where everything works.
+      </p>
+      <p>
+        The decisions below are ones I would defend in a design review. Each of them cost something,
+        and I have tried to say what.
+      </p>
     </div>
   </section>
 
-  <section>
-    <h2>Writing</h2>
-    <p class="hint">Research notes from reading protocols at the source rather than from summaries.</p>
+  <!-- ── WORK ───────────────────────────────────────── -->
+  <section id="work">
+    <p class="lab">02 — Selected work</p>
+    <h2>Four decisions</h2>
+    <p class="note">And what each one traded away</p>
 
-    <!-- TODO: repoint these to the published URLs once phillip-tech-labs is public. -->
-    <div class="piece">
-      <a href="https://github.com/philliptran1402">Three perpetual DEX architectures, compared</a>
-      <p>GMX settles trades against a shared liquidity pool, Hyperliquid runs a fully on-chain order book on its own L1, and Nado keeps matching off-chain with the risk engine on-chain. Three answers to the same constraint, with different things to trust.</p>
-    </div>
-    <div class="piece">
-      <a href="https://github.com/philliptran1402">Self-hosting an EVM node, and the gateway that belongs in front of it</a>
-      <p>What running an execution and consensus client actually requires, when self-hosting beats a provider, and why the gateway — not the node — is what makes the setup trustworthy.</p>
-    </div>
-    <div class="piece">
-      <a href="https://github.com/philliptran1402">What graph-node actually does when you deploy a subgraph</a>
-      <p>Entity versions keyed by block range, reorg reverts, proofs of indexing, and the point where a subgraph stops being the right tool and a custom indexer starts.</p>
+    <div class="cases">
+      <article class="case">
+        <div class="case-top">
+          <h3><span class="idx">01</span> &nbsp; Reorg-safe event indexer</h3>
+          <span class="kind">On-chain data · Settlement</span>
+        </div>
+        <dl>
+          <dt>Problem</dt>
+          <dd>An indexer that treats a recent block as final is a bug waiting for a reorg. Credit a deposit on data that later disappears and the ledger is wrong in the direction that loses money.</dd>
+          <dt>Approach</dt>
+          <dd>Verify the parent hash chain on every block rather than trusting block numbers. Store entities keyed by <b>block range</b> so a revert is a delete, not a repair. Tier confirmation policy by value — small amounts credit fast, large amounts wait for finality.</dd>
+          <dt>Trade-off</dt>
+          <dd>Large deposits settle noticeably slower, and the schema is more complex than a flat table. Accepted deliberately: latency is recoverable, an incorrect balance is not.</dd>
+        </dl>
+      </article>
+
+      <article class="case">
+        <div class="case-top">
+          <h3><span class="idx">02</span> &nbsp; Automated signing behind a policy engine</h3>
+          <span class="kind">Keys · Custody</span>
+        </div>
+        <dl>
+          <dt>Problem</dt>
+          <dd>A bot that signs without a human in the loop holds a hot key carrying the authority of the whole treasury. Protecting the key is not the same problem as constraining the <b>decision to sign</b>.</dd>
+          <dt>Approach</dt>
+          <dd>Separate the ability to sign from the authority to sign. A policy layer in front of the signer enforces per-action limits, destination allowlists and rate caps; anything outside policy escalates to a human instead of failing open.</dd>
+          <dt>Trade-off</dt>
+          <dd>More moving parts, and latency added to every transaction on the path. Bought in exchange: a bounded blast radius when — not if — something is compromised.</dd>
+        </dl>
+      </article>
+
+      <article class="case">
+        <div class="case-top">
+          <h3><span class="idx">03</span> &nbsp; RPC gateway with head-lag detection</h3>
+          <span class="kind">Infrastructure · Reliability</span>
+        </div>
+        <dl>
+          <dt>Problem</dt>
+          <dd>A single RPC URL is an invisible trust boundary. A provider serving a head from forty minutes ago returns no error — it returns <b>stale truth</b>, and everything downstream acts on it confidently.</dd>
+          <dt>Approach</dt>
+          <dd>Every service talks to one internal gateway. It probes each upstream's head, marks any source too far behind as lagging, fails over on errors, caps <code>eth_getLogs</code> ranges and allowlists methods. When only stale sources remain it refuses to answer rather than answering wrongly.</dd>
+          <dt>Trade-off</dt>
+          <dd>An extra hop, plus a component that now has to be operated and monitored itself. Bought: the ability to detect the lie instead of discovering the consequence.</dd>
+        </dl>
+      </article>
+
+      <article class="case">
+        <div class="case-top">
+          <h3><span class="idx">04</span> &nbsp; AI agent with deterministic guardrails</h3>
+          <span class="kind">Agents · Execution</span>
+        </div>
+        <dl>
+          <dt>Problem</dt>
+          <dd>A language model planning on-chain actions is useful precisely because it is not deterministic — the same reason it cannot be trusted with a signature.</dd>
+          <dd style="grid-column:2"></dd>
+          <dt>Approach</dt>
+          <dd>The model proposes, deterministic code disposes: intent, strategy, quotes across venues, simulation, policy check, then signing. Every step the model touches is replayable, and a model-initiated action passes the <b>same policy layer</b> a human-initiated one would.</dd>
+          <dt>Trade-off</dt>
+          <dd>The agent is slower and narrower than letting it call tools freely, and much of its output is rejected before execution. That is the design working, not failing.</dd>
+        </dl>
+      </article>
     </div>
   </section>
 
-  <section>
-    <h2>Capabilities</h2>
+  <!-- ── WRITING ────────────────────────────────────── -->
+  <section id="writing">
+    <p class="lab">03 — Writing</p>
+    <h2>Read at the source</h2>
+    <p class="note">Protocol research, not summaries of summaries</p>
+
+    <!-- TODO: repoint to published URLs once phillip-tech-labs is public -->
+    <a class="piece" href="https://github.com/philliptran1402">
+      <span class="n">01</span>
+      <span>
+        <h3>Three perpetual DEX architectures, compared</h3>
+        <p>GMX settles against a shared liquidity pool, Hyperliquid runs a fully on-chain order book on its own L1, Nado keeps matching off-chain with the risk engine on-chain. Three answers to one constraint — with different things to trust.</p>
+      </span>
+      <span class="go">↗</span>
+    </a>
+    <a class="piece" href="https://github.com/philliptran1402">
+      <span class="n">02</span>
+      <span>
+        <h3>Self-hosting an EVM node, and the gateway in front of it</h3>
+        <p>What running execution and consensus clients actually requires, when self-hosting beats a provider, and why the gateway — not the node — is what makes the setup trustworthy.</p>
+      </span>
+      <span class="go">↗</span>
+    </a>
+    <a class="piece" href="https://github.com/philliptran1402">
+      <span class="n">03</span>
+      <span>
+        <h3>What graph-node actually does when you deploy a subgraph</h3>
+        <p>Entity versions keyed by block range, reorg reverts, proofs of indexing — and the point where a subgraph stops being the right tool and a custom indexer starts.</p>
+      </span>
+      <span class="go">↗</span>
+    </a>
+  </section>
+
+  <!-- ── CAPABILITIES ───────────────────────────────── -->
+  <section id="stack">
+    <p class="lab">04 — Capabilities</p>
+    <h2>What I work with</h2>
+    <p class="note">Depth in two languages, literacy in the rest</p>
     <dl class="cap">
       <dt>Domains</dt>
-      <dd>Perpetual DEX · lending · options &amp; derivatives · RWA tokenization · AMM/DEX tooling · payments &amp; settlement</dd>
-
+      <dd>Perpetual DEX · lending · options &amp; derivatives · RWA tokenization · AMM tooling · payments &amp; settlement</dd>
       <dt>Languages</dt>
       <dd><b>TypeScript</b>, <b>Go</b>, <b>Rust</b>, Solidity, C#</dd>
-
       <dt>Backend</dt>
       <dd>Node.js / NestJS, Gin, ASP.NET Core · PostgreSQL, Redis, Kafka</dd>
-
       <dt>Blockchain</dt>
-      <dd>EVM, Foundry, viem / ethers.js, The Graph, Chainlink &amp; Pyth oracles, Safe</dd>
-
+      <dd>EVM, Foundry, viem / ethers.js, The Graph, Chainlink &amp; Pyth, Safe</dd>
       <dt>AI</dt>
       <dd>LLM application engineering — agent orchestration, tool calling, RAG, evals</dd>
-
       <dt>Infrastructure</dt>
       <dd>Docker, Kubernetes, AWS, Terraform · Datadog, Grafana, Sentry</dd>
     </dl>
   </section>
 
-  <footer>
-    <h2>Contact</h2>
-    <p>
-      Open to senior and lead roles on backend or DeFi infrastructure, remote.
-      Reach me at <a href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
-      or on <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>.
-    </p>
-    <p class="fine">
-      Hand-written static HTML, no build step ·
-      <a href="https://github.com/philliptran1402/philliptran1402.github.io">source</a>
-    </p>
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer id="contact">
+    <p class="lab">05 — Contact</p>
+    <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+    <div class="foot-row">
+      <span>Open to senior &amp; lead roles · remote</span>
+      <span>
+        <a href="https://github.com/philliptran1402">GitHub</a> ·
+        <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+      </span>
+      <span>© 2026 Phi Tran</span>
+    </div>
   </footer>
 
 </div>
+
+<!-- ── MENU OVERLAY ─────────────────────────────────── -->
+<div class="scrim" id="scrim"></div>
+<div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="panel-top">
+    <span>/ Menu</span>
+    <button class="close-btn" id="close">Close</button>
+  </div>
+  <nav class="nav">
+    <a href="#about">ABOUT</a>
+    <a href="#work">WORK</a>
+  </nav>
+  <p class="connect">Connect</p>
+  <div class="conn-grid">
+    <a href="https://github.com/philliptran1402"><span class="num">01</span> GitHub <span class="arw">↗</span></a>
+    <a href="https://linkedin.com/in/phitrantech"><span class="num">02</span> LinkedIn <span class="arw">↗</span></a>
+    <a href="mailto:phitranviet99@gmail.com"><span class="num">03</span> Email <span class="arw">↗</span></a>
+    <a href="#writing"><span class="num">04</span> Writing <span class="arw">↗</span></a>
+  </div>
+  <p class="panel-foot">© 2026 by Phi Tran</p>
+</div>
+
+<script>
+  // live clock, Da Nang
+  function tick(){
+    var el = document.getElementById('clock');
+    if (!el) return;
+    el.textContent = new Date().toLocaleTimeString('en-US', {
+      timeZone:'Asia/Ho_Chi_Minh', hour:'2-digit', minute:'2-digit', hour12:true
+    });
+  }
+  tick(); setInterval(tick, 10000);
+
+  // menu
+  var panel = document.getElementById('panel'), scrim = document.getElementById('scrim');
+  function open(){ panel.classList.add('on'); scrim.classList.add('on'); }
+  function shut(){ panel.classList.remove('on'); scrim.classList.remove('on'); }
+  document.getElementById('open').addEventListener('click', open);
+  document.getElementById('close').addEventListener('click', shut);
+  scrim.addEventListener('click', shut);
+  panel.addEventListener('click', function(e){ if (e.target.tagName === 'A') shut(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') shut(); });
+</script>
+
 </body>
 </html>
