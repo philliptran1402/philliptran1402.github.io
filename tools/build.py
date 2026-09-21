@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
 """
-Generate the work section from tools/projects.json.
+Generate the work and blog sections from tools/*.json.
 
-    python3 tools/build-work.py
+    python3 tools/build.py
 
-Writes work/index.html (the filterable grid) and work/<slug>/index.html for
-every project. This is a local convenience, not a CI build step — the output
-is committed and GitHub Pages serves plain static files with nothing to build.
+Writes:
+    work/index.html            filterable project grid
+    work/<slug>/index.html     one page per project
+    blog/index.html            post list
+    blog/<slug>/index.html     one page per post
 
-Adding or editing a project means editing projects.json and re-running this,
-which is the reason it exists: fifteen hand-written pages drift, one template
-does not.
+This is a local convenience, not a CI build step — the output is committed and
+GitHub Pages serves plain static files with nothing to build. Adding a project
+or a post means editing JSON and re-running this, which is the reason it
+exists: twenty hand-written pages drift, one template does not.
 """
 
 import html
 import json
+import re
 import pathlib
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DATA = ROOT / "tools" / "projects.json"
+PROJECTS = ROOT / "tools" / "projects.json"
+POSTS = ROOT / "tools" / "posts.json"
 WORK = ROOT / "work"
+BLOG = ROOT / "blog"
 
+MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 CATS = [("case", "Case study"), ("research", "Protocol research"), ("lab", "Runnable lab")]
 
 
@@ -68,8 +75,9 @@ def head(title, desc, css_depth, canonical):
 """
 
 
-def tail(css_depth, about, work):
+def tail(css_depth, about, work, blog=None):
     up = "../" * css_depth
+    blog = blog or (up + "blog/")
     return f"""
 <div class="scrim" id="scrim"></div>
 <div class="panel" id="panel" role="dialog" aria-modal="true" aria-label="Menu">
@@ -80,6 +88,7 @@ def tail(css_depth, about, work):
   <nav class="nav">
     <a href="{about}">ABOUT</a>
     <a href="{work}">WORK</a>
+    <a href="{blog}">BLOG</a>
   </nav>
   <p class="connect">Connect</p>
   <div class="conn-grid">
@@ -257,8 +266,126 @@ def build_detail(p, prev_p, next_p, by_slug):
     (out / "index.html").write_text(page, encoding="utf-8")
 
 
+def reading_time(post):
+    """Minutes at 200 wpm, computed from the body so it cannot drift."""
+    words = sum(len(re.sub(r"<[^>]+>", " ", b).split()) for _, b in post["body"])
+    return max(1, round(words / 200))
+
+
+def pretty_date(iso):
+    y, m, d = iso.split("-")
+    return f"{d} {MONTHS[int(m) - 1]} {y}"
+
+
+def build_blog_index(posts):
+    rows = []
+    for p in posts:
+        rows.append(f"""      <a class="post rv" href="{p['slug']}/">
+        <div class="post-meta">
+          <span class="post-date">{pretty_date(p['date'])}</span>
+          <span class="post-tag">{html.escape(p['tag'])}</span>
+          <span class="post-time">{reading_time(p)} min</span>
+        </div>
+        <h2 class="post-title">{html.escape(p['title'])}</h2>
+        <p class="post-ex">{html.escape(p['excerpt'])}</p>
+        <span class="post-go">Read ↗</span>
+      </a>
+""")
+
+    body = f"""
+<div class="wrap">
+
+  <div class="work-head">
+    <div></div>
+    <div>
+      <span class="pill">Notes &amp; essays</span>
+      <h1 class="work-title" data-scramble>BLOG</h1>
+      <p class="detail-sum" style="margin-top:20px">
+        Written when something turned out differently than expected — protocol
+        internals, infrastructure decisions, and the occasional claim that did
+        not survive checking.
+      </p>
+    </div>
+  </div>
+
+  <div class="posts">
+{''.join(rows)}  </div>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← Back home</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+"""
+    page = (head("Blog — Phi Tran",
+                 "Notes on protocol internals, infrastructure decisions and verification.",
+                 1, "blog/")
+            + body + tail(1, "../#about", "../work/", "./"))
+    BLOG.mkdir(exist_ok=True)
+    (BLOG / "index.html").write_text(page, encoding="utf-8")
+
+
+def build_post(p, prev_p, next_p):
+    sections = ""
+    for h, b in p["body"]:
+        head_html = f'    <p class="lab">{html.escape(h)}</p>\n' if h else ""
+        sections += f'\n  <section class="rv">\n{head_html}    <div class="prose">{b}</div>\n  </section>\n'
+
+    nav = []
+    nav.append(f'<a href="../{prev_p["slug"]}/">← {html.escape(prev_p["title"][:44])}</a>' if prev_p else "<span></span>")
+    nav.append('<a href="../">All posts</a>')
+    nav.append(f'<a href="../{next_p["slug"]}/">{html.escape(next_p["title"][:44])} →</a>' if next_p else "<span></span>")
+
+    body = f"""
+<div class="wrap">
+
+  <div class="detail-head">
+    <p class="crumb"><a href="../">Blog</a> <span>/</span> {html.escape(p['tag'])}</p>
+    <div class="post-meta" style="margin-bottom:6px">
+      <span class="post-date">{pretty_date(p['date'])}</span>
+      <span class="post-time">{reading_time(p)} min read</span>
+    </div>
+    <h1 class="detail-title">{html.escape(p['title'])}</h1>
+    <p class="detail-sum">{html.escape(p['excerpt'])}</p>
+  </div>
+{sections}
+  <nav class="pager">
+    {nav[0]}
+    {nav[1]}
+    {nav[2]}
+  </nav>
+</div>
+
+<footer class="wrap">
+  <p class="lab">Contact</p>
+  <a class="big-mail" href="mailto:phitranviet99@gmail.com">phitranviet99@gmail.com</a>
+  <div class="foot-row">
+    <span><a href="../">← All posts</a></span>
+    <span>
+      <a href="https://github.com/philliptran1402">GitHub</a> ·
+      <a href="https://linkedin.com/in/phitrantech">LinkedIn</a>
+    </span>
+    <span>© 2026 Phi Tran</span>
+  </div>
+</footer>
+"""
+    page = (head(f"{p['title']} — Phi Tran", p["excerpt"], 2, f"blog/{p['slug']}/")
+            + body + tail(2, "../../#about", "../../work/", "../"))
+    out = BLOG / p["slug"]
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "index.html").write_text(page, encoding="utf-8")
+
+
 def main():
-    projects = json.loads(DATA.read_text(encoding="utf-8"))
+    projects = json.loads(PROJECTS.read_text(encoding="utf-8"))
     by_slug = {p["slug"]: p for p in projects}
 
     slugs = [p["slug"] for p in projects]
@@ -275,8 +402,21 @@ def main():
         build_detail(p, projects[i - 1] if i else None,
                      projects[i + 1] if i + 1 < len(projects) else None, by_slug)
 
+    posts = json.loads(POSTS.read_text(encoding="utf-8"))
+    posts.sort(key=lambda x: x["date"], reverse=True)
+    pslugs = [x["slug"] for x in posts]
+    if len(set(pslugs)) != len(pslugs):
+        sys.exit("duplicate slug in posts.json")
+
+    build_blog_index(posts)
+    for i, p in enumerate(posts):
+        build_post(p, posts[i - 1] if i else None,
+                   posts[i + 1] if i + 1 < len(posts) else None)
+
     print(f"work/index.html  — {total} projects {counts}")
     print(f"work/<slug>/     — {len(projects)} detail pages")
+    print(f"blog/index.html  — {len(posts)} posts")
+    print(f"blog/<slug>/     — {len(posts)} post pages")
 
 
 if __name__ == "__main__":
