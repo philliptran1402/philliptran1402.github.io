@@ -59,6 +59,14 @@ PERSON = {
     "sameAs": ["https://github.com/philliptran1402", "https://linkedin.com/in/phitrantech"],
 }
 
+def graph(*nodes):
+    """One @context, many nodes. Node references ({"@id": ...}) only resolve
+       when the target lives in the same document — a bare array of top-level
+       objects where only the first carries @context leaves the rest untyped,
+       which is what Google reports as an invalid mainEntity."""
+    return {"@context": "https://schema.org", "@graph": [n for n in nodes if n]}
+
+
 MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 CATS = [("case", "Case study"), ("research", "Protocol research"), ("lab", "Runnable lab")]
 
@@ -222,12 +230,14 @@ def build_index(projects):
   </div>
 </footer>
 """
-    ld = {"@context": "https://schema.org", "@type": "CollectionPage",
-          "name": "Work — Phi Tran", "url": SITE + "work/",
-          "about": {"@id": SITE + "#phitran"},
-          "hasPart": [{"@type": "CreativeWork", "name": p["title"],
-                       "url": SITE + "work/" + p["slug"] + "/",
-                       "abstract": p["summary"]} for p in projects]}
+    ld = graph(
+        {"@type": "CollectionPage", "@id": SITE + "work/",
+         "name": "Work — Phi Tran", "url": SITE + "work/",
+         "about": {"@id": SITE + "#phitran"},
+         "hasPart": [{"@type": "CreativeWork", "name": p["title"],
+                      "url": SITE + "work/" + p["slug"] + "/",
+                      "abstract": p["summary"]} for p in projects]},
+        PERSON)
     page = (
         head("Work — Phi Tran",
              "Selected engineering work: money-path case studies, protocol research notes and runnable infrastructure labs.",
@@ -312,20 +322,21 @@ def build_detail(p, prev_p, next_p, by_slug):
   </div>
 </footer>
 """
-    ld = [
-        {"@context": "https://schema.org", "@type": "TechArticle",
+    ld = graph(
+        {"@type": "TechArticle", "@id": SITE + "work/" + p["slug"] + "/#article",
          "headline": p["title"], "abstract": p["summary"],
          "url": SITE + "work/" + p["slug"] + "/",
          "mainEntityOfPage": SITE + "work/" + p["slug"] + "/",
          "author": {"@id": SITE + "#phitran"}, "publisher": {"@id": SITE + "#phitran"},
          "inLanguage": "en", "about": p["kind"],
-         "isPartOf": {"@type": "CollectionPage", "url": SITE + "work/"}},
-        {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+         "isPartOf": {"@id": SITE + "work/"}},
+        {"@type": "BreadcrumbList", "@id": SITE + "work/" + p["slug"] + "/#crumb",
+         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE},
             {"@type": "ListItem", "position": 2, "name": "Work", "item": SITE + "work/"},
             {"@type": "ListItem", "position": 3, "name": p["title"]}]},
-        PERSON,
-    ]
+        {"@type": "CollectionPage", "@id": SITE + "work/", "url": SITE + "work/", "name": "Work — Phi Tran"},
+        PERSON)
     page = (
         head(f"{p['title']} — Phi Tran", p["summary"], 2, f"work/{p['slug']}/", ld)
         + body
@@ -398,12 +409,14 @@ def build_blog_index(posts):
   </div>
 </footer>
 """
-    ld = {"@context": "https://schema.org", "@type": "Blog",
-          "name": "Blog — Phi Tran", "url": SITE + "blog/",
-          "author": {"@id": SITE + "#phitran"},
+    ld = graph(
+        {"@type": "Blog", "@id": SITE + "blog/",
+         "name": "Blog — Phi Tran", "url": SITE + "blog/",
+         "author": {"@id": SITE + "#phitran"},
           "blogPost": [{"@type": "BlogPosting", "headline": x["title"],
                         "url": SITE + "blog/" + x["slug"] + "/",
-                        "datePublished": x["date"], "abstract": x["excerpt"]} for x in posts]}
+                       "datePublished": x["date"], "abstract": x["excerpt"]} for x in posts]},
+        PERSON)
     page = (head("Blog — Phi Tran",
                  "Notes on protocol internals, infrastructure decisions and verification.",
                  1, "blog/", ld)
@@ -459,8 +472,8 @@ def build_post(p, prev_p, next_p):
   </div>
 </footer>
 """
-    ld = [
-        {"@context": "https://schema.org", "@type": "BlogPosting",
+    ld = graph(
+        {"@type": "BlogPosting", "@id": SITE + "blog/" + p["slug"] + "/#post",
          "headline": p["title"], "abstract": p["excerpt"], "description": p["excerpt"],
          "url": SITE + "blog/" + p["slug"] + "/",
          "mainEntityOfPage": SITE + "blog/" + p["slug"] + "/",
@@ -468,13 +481,14 @@ def build_post(p, prev_p, next_p):
          "keywords": p["tag"], "inLanguage": "en",
          "wordCount": sum(len(re.sub(r"<[^>]+>", " ", b).split()) for _, b in p["body"]),
          "author": {"@id": SITE + "#phitran"}, "publisher": {"@id": SITE + "#phitran"},
-         "isPartOf": {"@type": "Blog", "url": SITE + "blog/"}},
-        {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+         "isPartOf": {"@id": SITE + "blog/"}},
+        {"@type": "BreadcrumbList", "@id": SITE + "blog/" + p["slug"] + "/#crumb",
+         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE},
             {"@type": "ListItem", "position": 2, "name": "Blog", "item": SITE + "blog/"},
             {"@type": "ListItem", "position": 3, "name": p["title"]}]},
-        PERSON,
-    ]
+        {"@type": "Blog", "@id": SITE + "blog/", "url": SITE + "blog/", "name": "Blog — Phi Tran"},
+        PERSON)
     page = (head(f"{p['title']} — Phi Tran", p["excerpt"], 2, f"blog/{p['slug']}/", ld)
             + body + tail(2, "../../#about", "../../work/", "../"))
     out = BLOG / p["slug"]
